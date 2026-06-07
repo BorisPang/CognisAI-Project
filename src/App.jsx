@@ -2518,7 +2518,7 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
 
   const [prepPhase, setPrepPhase] = useState(() => {
     if (title !== '备课') return 'grid';
-    return 'knowledgeList'; // 默认显示知识点列表
+    return 'grid'; // 默认直接显示课程模块页面（复用上课模式）
   });
   
   const [expandedCourseOutline, setExpandedCourseOutline] = useState(null);
@@ -2785,7 +2785,7 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
                   </h3>
                   {title === '备课' && (
                     <button onClick={() => { if (setIsCourseBuilt) setIsCourseBuilt(false); setSelectedFiles([]); setPrepPhase('upload'); }} className="flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 rounded-lg text-sm font-medium transition-all shadow-sm">
-                      <UploadCloud className="w-4 h-4 mr-2" /> 重新导入教案
+                      <UploadCloud className="w-4 h-4 mr-2" /> 重新导入 / 重新生成
                     </button>
                   )}
                 </div>
