@@ -2808,6 +2808,42 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
                   {courseList.map((course, idx) => {
                     const isExpanded = expandedCourseCard === idx;
                     const points = knowledgePoints[course] ? knowledgePoints[course].split('\n') : [];
+                    const isLocked = idx >= 6; // 第三章开始（索引6）锁定
+                    
+                    if (isLocked) {
+                      return (
+                        <div 
+                          key={idx} 
+                          className="p-4 rounded-xl border bg-slate-50 text-slate-400 flex flex-col justify-between transition-all duration-300 border-slate-200 cursor-not-allowed opacity-70"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2">
+                              <Lock className="w-4 h-4" />
+                              <div className="text-sm font-medium leading-relaxed">{course}</div>
+                            </div>
+                            <span className="text-xs bg-slate-200 px-2 py-0.5 rounded-full">已锁定</span>
+                          </div>
+                          
+                          {isExpanded && points.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-slate-200 animate-in fade-in slide-in-from-top-2">
+                              <div className="flex flex-wrap gap-2">
+                                {points.map((point, pIdx) => (
+                                  <span 
+                                    key={pIdx}
+                                    className="text-xs bg-slate-200 text-slate-500 px-2 py-1 rounded-full border border-slate-300"
+                                  >
+                                    {point}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {renderTags(title, course)}
+                        </div>
+                      );
+                    }
+                    
                     return (
                       <div 
                         key={idx} 
