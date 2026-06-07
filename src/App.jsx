@@ -2523,10 +2523,25 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
   
   const [expandedCourseOutline, setExpandedCourseOutline] = useState(null);
   const [expandedKnowledgePoint, setExpandedKnowledgePoint] = useState(null);
+  const [expandedCourseCard, setExpandedCourseCard] = useState(null);
   
   const [knowledgePoints, setKnowledgePoints] = useState({
-      "第一章第4-6节 误差的表示和消除": "误差的分类（系统误差，随机误差，数据误差）\n绝对误差\n相对误差\n引用误差",
-      "第四章第1-5节 频率与相位的测量": "工频测量\n高低频测量\n电动系频率表\n变换式频率表"
+      "第一章第1-3节 电工仪表与测量的基本方法": "电工测量的基本概念与任务\n电工仪表的分类与基本组成\n测量方法的分类：直接测量、间接测量、比较测量\n测量系统的组成与测量过程分析",
+      "第一章第4-6节 误差的表示和消除": "绝对误差、相对误差与引用误差\n系统误差、随机误差与粗大误差\n仪表准确度等级与测量结果评价\n误差来源分析与误差消除方法",
+      "第二章第1-2节 电压与电流的测量&磁电系仪表": "电压测量与电流测量的基本原理\n电压表、电流表的接入方式\n磁电系仪表的结构与工作原理\n仪表内阻对测量结果的影响",
+      "第二章第3-4节 磁电系检流计&电磁系仪表": "磁电系检流计的灵敏度与使用方法\n电磁系仪表的结构与转矩形成原理\n交直流测量中的仪表适用性\n检流计在桥式测量中的应用",
+      "第二章第5-7节 电动系仪表&万用电表": "电动系仪表的工作原理与特点\n电动系仪表在功率测量中的应用\n万用表的基本结构与测量功能\n万用表使用中的量程选择与误差控制",
+      "第二章第8-10节 直流电位差计&电子系电压表": "直流电位差计的补偿测量原理\n标准电池与工作电流校准\n电子电压表的输入阻抗与测量特点\n高阻抗测量对电路状态的影响",
+      "第三章第1-4节 功率与电能的测量": "单相有功功率测量原理\n功率表的接线方式与读数方法\n电能测量的基本原理\n功率因数对测量结果的影响",
+      "第三章第5-7节 三相有功电能表": "三相有功功率的测量方法\n三相电能表的结构与工作原理\n三相三线制与三相四线制电能测量\n三相负载不平衡对电能计量的影响",
+      "第三章第8-9节 电子式单相&三相电能表": "电子式电能表的采样与计量原理\n电压、电流信号调理与数字化处理\n单相与三相电子式电能表的功能差异\n智能电能表的数据通信与误差分析",
+      "第四章第1-5节 频率与相位的测量": "频率测量的基本方法\n相位差测量的基本原理\n电子计数法测频原理\n相序判断与相位差测定方法",
+      "第五章第1-3节 电路参数的测量（一）": "电阻测量的基本方法\n伏安法测电阻及误差分析\n电桥法测量电阻\n接触电阻与引线电阻的影响",
+      "第五章第4-7节 电路参数的测量（二）": "电感参数的测量方法\n电容参数的测量方法\n交流电桥测量原理\nQ值、损耗角与等效参数分析",
+      "第六章第1-7节 波形的测量": "示波器的基本结构与工作原理\n电压幅值、周期与频率的波形测量\n波形失真与噪声观察\n示波器探头衰减与测量误差",
+      "第八章第1-4节 数字电压表": "数字电压表的基本组成\nA/D 转换原理与测量分辨率\n量程切换与输入阻抗\n数字电压表的误差来源与性能指标",
+      "第九章第1-3节 数字功率表&第十章第1-3节 数字频率表": "数字功率表的采样测量原理\n有功功率、无功功率与功率因数计算\n数字频率表的计数测频原理\n采样窗口、闸门时间与测量精度",
+      "第十一章第1-3节 数字参数测量仪&第十二章第1-4节 数字示波器": "数字参数测量仪的功能与应用\n电阻、电容、电感等参数的自动测量\n数字示波器的采样、存储与显示原理\n数字示波器在异常波形分析中的应用"
   });
   
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -2791,9 +2806,46 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {courseList.map((course, idx) => {
+                    const isExpanded = expandedCourseCard === idx;
+                    const points = knowledgePoints[course] ? knowledgePoints[course].split('\n') : [];
                     return (
-                      <div key={idx} onClick={() => handleCourseClick(course)} className="p-4 rounded-xl border bg-white text-slate-700 flex flex-col justify-between min-h-[110px] transition-all duration-300 border-slate-200 hover:border-teal-400 hover:shadow-md cursor-pointer hover:-translate-y-1">
-                        <div className="text-sm font-medium leading-relaxed">{course}</div>
+                      <div 
+                        key={idx} 
+                        className="p-4 rounded-xl border bg-white text-slate-700 flex flex-col justify-between transition-all duration-300 border-slate-200 hover:border-teal-400 hover:shadow-md"
+                      >
+                        <div 
+                          onClick={() => handleCourseClick(course)} 
+                          className="cursor-pointer flex items-start justify-between"
+                        >
+                          <div className="text-sm font-medium leading-relaxed">{course}</div>
+                          {points.length > 0 && (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedCourseCard(isExpanded ? null : idx);
+                              }} 
+                              className="text-slate-400 hover:text-slate-600 p-0.5"
+                            >
+                              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-teal-500' : ''}`} />
+                            </button>
+                          )}
+                        </div>
+                        
+                        {isExpanded && points.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+                            <div className="flex flex-wrap gap-2">
+                              {points.map((point, pIdx) => (
+                                <span 
+                                  key={pIdx}
+                                  className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full border border-slate-200"
+                                >
+                                  {point}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
                         {renderTags(title, course)}
                       </div>
                     );
