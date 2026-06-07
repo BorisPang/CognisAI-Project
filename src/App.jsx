@@ -2811,12 +2811,10 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
                     return (
                       <div 
                         key={idx} 
-                        className="p-4 rounded-xl border bg-white text-slate-700 flex flex-col justify-between transition-all duration-300 border-slate-200 hover:border-teal-400 hover:shadow-md"
+                        onClick={() => handleCourseClick(course)}
+                        className="p-4 rounded-xl border bg-white text-slate-700 flex flex-col justify-between transition-all duration-300 border-slate-200 hover:border-teal-400 hover:shadow-md cursor-pointer hover:-translate-y-1"
                       >
-                        <div 
-                          onClick={() => handleCourseClick(course)} 
-                          className="cursor-pointer flex items-start justify-between"
-                        >
+                        <div className="flex items-start justify-between">
                           <div className="text-sm font-medium leading-relaxed">{course}</div>
                           {points.length > 0 && (
                             <button 
