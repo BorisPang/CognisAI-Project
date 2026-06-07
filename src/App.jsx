@@ -40,6 +40,40 @@ const courseList = [
   "第十一章第1-3节 数字参数测量仪&第十二章第1-4节 数字示波器"
 ];
 
+// --- 备课模式 - 课程知识点列表 Mock 数据 (简化版) ---
+const knowledgePointMockData = [
+  {
+    chapter: "第一章",
+    name: "电工仪表与测量的基本知识",
+    objective: "理解电工仪表的工作原理，掌握测量误差的计算方法",
+    keyPoints: "仪表分类、误差计算"
+  },
+  {
+    chapter: "第二章",
+    name: "电流与电压的测量",
+    objective: "掌握磁电系、电磁系、电动系仪表的工作原理",
+    keyPoints: "仪表结构、工作原理"
+  },
+  {
+    chapter: "第三章",
+    name: "功率与电能的测量",
+    objective: "掌握功率表和电能表的原理与使用方法",
+    keyPoints: "单相功率测量、三相功率测量"
+  },
+  {
+    chapter: "第四章",
+    name: "频率与相位的测量",
+    objective: "理解频率表和相位差测量方法",
+    keyPoints: "频率测量、相位差测定"
+  },
+  {
+    chapter: "第五章",
+    name: "电路参数的测量",
+    objective: "掌握电阻、电容、电感的测量方法",
+    keyPoints: "电桥法、示波器法"
+  }
+];
+
 // --- 动态获取弹窗选项 ---
 const getModalOptions = (title, course) => {
   if (title === '备课') return [{ label: '思政导入', path: '备课-思政导入', icon: BookOpen }, { label: '案例生成', path: '备课-案例生成', icon: FileText }];
@@ -2484,10 +2518,11 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
 
   const [prepPhase, setPrepPhase] = useState(() => {
     if (title !== '备课') return 'grid';
-    return isCourseBuilt ? 'grid' : 'upload';
+    return 'knowledgeList'; // 默认显示知识点列表
   });
   
   const [expandedCourseOutline, setExpandedCourseOutline] = useState(null);
+  const [expandedKnowledgePoint, setExpandedKnowledgePoint] = useState(null);
   
   const [knowledgePoints, setKnowledgePoints] = useState({
       "第一章第4-6节 误差的表示和消除": "误差的分类（系统误差，随机误差，数据误差）\n绝对误差\n相对误差\n引用误差",
@@ -2497,13 +2532,10 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
-    if (title === '备课') {
-      setPrepPhase(isCourseBuilt ? 'grid' : 'upload');
-      if (!isCourseBuilt) setSelectedFiles([]); 
-    } else {
+    if (title !== '备课') {
       setPrepPhase('grid');
     }
-  }, [title, isCourseBuilt]);
+  }, [title]);
 
   useEffect(() => {
     if (prepPhase === 'building') {
@@ -2613,6 +2645,51 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
           </div>
 
           <div className="flex-grow p-8 bg-slate-50/50">
+            {prepPhase === 'knowledgeList' && (
+              <div className="animate-in fade-in duration-500">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-800 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-blue-500" /> 课程知识点列表
+                  </h3>
+                  {title === '备课' && (
+                    <button onClick={() => setPrepPhase('upload')} className="flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 rounded-lg text-sm font-medium transition-all shadow-sm">
+                      <RefreshCw className="w-4 h-4 mr-2" /> 重新导入/重新生成
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {knowledgePointMockData.map((point, idx) => {
+                    const isExpanded = expandedKnowledgePoint === idx;
+                    return (
+                      <div key={idx} className={`border rounded-2xl bg-white overflow-hidden transition-all hover:border-blue-300 hover:shadow-sm ${isExpanded ? 'border-blue-300 shadow-md ring-1 ring-blue-50' : 'border-slate-200'}`}>
+                        <div onClick={() => setExpandedKnowledgePoint(isExpanded ? null : idx)} className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center space-x-4 min-w-0">
+                            <span className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full whitespace-nowrap">{point.chapter}</span>
+                            <span className="font-semibold text-slate-700 text-base truncate">{point.name}</span>
+                          </div>
+                          <ChevronDown className={`w-5 h-5 flex-shrink-0 ml-3 transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-500' : 'text-slate-400'}`} />
+                        </div>
+                        {isExpanded && (
+                          <div className="p-6 border-t border-blue-100 bg-blue-50/20 animate-in fade-in slide-in-from-top-2 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-white rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">教学目标</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.objective}</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">重点难点</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.keyPoints}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {prepPhase === 'upload' && (
               <div className="h-full flex flex-col items-center justify-center min-h-[400px] animate-in fade-in duration-500 py-6">
                 <label className={`border-2 border-dashed border-blue-300 bg-blue-50/50 rounded-3xl p-12 w-full max-w-2xl text-center transition-colors flex flex-col items-center shadow-sm ${selectedFiles.length >= 5 ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-100'}`} onDragOver={(e) => e.preventDefault()} onDrop={selectedFiles.length >= 5 ? (e) => e.preventDefault() : handleFileUpload}>
