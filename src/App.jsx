@@ -40,6 +40,106 @@ const courseList = [
   "第十一章第1-3节 数字参数测量仪&第十二章第1-4节 数字示波器"
 ];
 
+// --- 备课模式 - 课程知识点列表 Mock 数据 (电气测量技术) ---
+const knowledgePointMockData = [
+  {
+    chapter: "第一章 电工仪表与测量的基本知识",
+    name: "电工仪表的基本原理与分类",
+    objective: "理解电工仪表的工作原理，掌握模拟式与数字式仪表的分类方法",
+    keyPoints: "重点：仪表分类体系、工作原理；难点：模拟仪表与数字仪表的工作机制差异",
+    experiment: "电工仪表认知与分类实验",
+    aiAssist: "AI可生成仪表分类思维导图，自动推送仪表选型案例分析"
+  },
+  {
+    chapter: "第一章 电工仪表与测量的基本知识",
+    name: "测量误差的表示与消除方法",
+    objective: "掌握绝对误差、相对误差、引用误差的计算方法，理解系统误差与随机误差的消除策略",
+    keyPoints: "重点：误差计算公式及其应用；难点：系统误差与随机误差的区分及消除方法",
+    experiment: "万用表测量误差分析实验",
+    aiAssist: "AI可自动生成误差计算练习题，智能批改并提供错因分析"
+  },
+  {
+    chapter: "第二章 电流与电压的测量",
+    name: "磁电系仪表的结构与工作原理",
+    objective: "掌握磁电系仪表的结构组成、工作原理及技术特性，能正确选用磁电系仪表",
+    keyPoints: "重点：磁电系仪表转矩产生原理；难点：温度补偿与频率特性分析",
+    experiment: "磁电系电流表电压表的使用与校准",
+    aiAssist: "AI可生成磁电系仪表3D拆解动画，辅助理解内部结构"
+  },
+  {
+    chapter: "第二章 电流与电压的测量",
+    name: "电磁系仪表与电动系仪表",
+    objective: "理解电磁系和电动系仪表的工作原理，掌握其应用场景与使用方法",
+    keyPoints: "重点：电磁系仪表的工作原理及应用；难点：电动系仪表的转矩方程推导",
+    experiment: "电磁系与电动系仪表特性对比实验",
+    aiAssist: "AI可模拟仪表在不同工况下的响应曲线，辅助教学演示"
+  },
+  {
+    chapter: "第二章 电流与电压的测量",
+    name: "万用电表与直流电位差计",
+    objective: "掌握万用电表的功能结构与使用方法，理解直流电位差计的测量原理",
+    keyPoints: "重点：万用电表各档位工作原理；难点：电位差计补偿法测量原理",
+    experiment: "万用表综合测量实验",
+    aiAssist: "AI可生成万用表虚拟仿真操作练习，实时反馈操作正确性"
+  },
+  {
+    chapter: "第三章 功率与电能的测量",
+    name: "单相功率与三相功率的测量",
+    objective: "掌握单相功率和三相功率的测量方法，理解功率表的工作原理",
+    keyPoints: "重点：功率表接线方法与读数计算；难点：三相功率测量中的接线方式选择",
+    experiment: "单相与三相功率测量实验",
+    aiAssist: "AI可生成功率测量电路接线图，自动检测接线错误"
+  },
+  {
+    chapter: "第三章 功率与电能的测量",
+    name: "三相电能表的原理与使用",
+    objective: "理解三相有功电能表的结构和工作原理，掌握电能表的接线与校验方法",
+    keyPoints: "重点：电能表转矩与制动力矩平衡；难点：三相电能表接线方式与相量分析",
+    experiment: "三相电能表校验实验",
+    aiAssist: "AI可生成电能表接线虚拟仿真，自动计算电费及误差分析"
+  },
+  {
+    chapter: "第四章 频率与相位的测量",
+    name: "频率测量方法概述",
+    objective: "掌握工频、低频和高频信号的频率测量方法，理解各类频率表的工作原理",
+    keyPoints: "重点：电动系频率表与变换式频率表原理；难点：频率测量范围的扩展技术",
+    experiment: "频率表校验与频率测量实验",
+    aiAssist: "AI可生成频率测量方法对比图表，辅助学生理解不同频段的测量策略"
+  },
+  {
+    chapter: "第四章 频率与相位的测量",
+    name: "相位差的测量方法",
+    objective: "掌握相位差的基本概念与测量方法，理解相位测量在电力系统中的重要性",
+    keyPoints: "重点：相位差测量原理；难点：相序测定与相位差计算",
+    experiment: "相位差测量与相序测定实验",
+    aiAssist: "AI可生成相位差动态演示动画，展示电压电流波形相位关系"
+  },
+  {
+    chapter: "第五章 电路参数的测量",
+    name: "电阻、电容与电感的测量",
+    objective: "掌握电阻、电容、电感等电路参数的测量原理与方法",
+    keyPoints: "重点：电桥法测量原理；难点：交流电桥的平衡条件分析",
+    experiment: "直流电桥与交流电桥测量实验",
+    aiAssist: "AI可自动生成电桥测量习题，智能评分并提供解题思路"
+  },
+  {
+    chapter: "第六章 波形的测量",
+    name: "示波器的原理与使用",
+    objective: "理解电子示波器的基本结构和工作原理，掌握示波器的正确使用方法",
+    keyPoints: "重点：示波器各功能旋钮作用；难点：触发方式选择与波形稳定显示",
+    experiment: "示波器测量波形参数实验",
+    aiAssist: "AI可生成虚拟示波器操作面板，支持交互式波形测量练习"
+  },
+  {
+    chapter: "第六章 波形的测量",
+    name: "数字存储示波器与波形分析",
+    objective: "理解数字存储示波器的工作原理，掌握波形参数自动测量与分析方法",
+    keyPoints: "重点：数字示波器采样原理与存储深度；难点：FFT频谱分析功能的使用",
+    experiment: "数字示波器波形采集与分析实验",
+    aiAssist: "AI可模拟数字示波器界面，辅助学生理解采样率与带宽的关系"
+  }
+];
+
 // --- 动态获取弹窗选项 ---
 const getModalOptions = (title, course) => {
   if (title === '备课') return [{ label: '思政导入', path: '备课-思政导入', icon: BookOpen }, { label: '案例生成', path: '备课-案例生成', icon: FileText }];
@@ -2484,10 +2584,11 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
 
   const [prepPhase, setPrepPhase] = useState(() => {
     if (title !== '备课') return 'grid';
-    return isCourseBuilt ? 'grid' : 'upload';
+    return 'knowledgeList';
   });
   
   const [expandedCourseOutline, setExpandedCourseOutline] = useState(null);
+  const [expandedKnowledgePoint, setExpandedKnowledgePoint] = useState(null);
   
   const [knowledgePoints, setKnowledgePoints] = useState({
       "第一章第4-6节 误差的表示和消除": "误差的分类（系统误差，随机误差，数据误差）\n绝对误差\n相对误差\n引用误差",
@@ -2498,7 +2599,9 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
 
   useEffect(() => {
     if (title === '备课') {
-      setPrepPhase(isCourseBuilt ? 'grid' : 'upload');
+      if (prepPhase === 'grid' || prepPhase === 'upload' || prepPhase === 'parsing' || prepPhase === 'outline' || prepPhase === 'building') {
+        setPrepPhase(isCourseBuilt ? 'grid' : 'knowledgeList');
+      }
       if (!isCourseBuilt) setSelectedFiles([]); 
     } else {
       setPrepPhase('grid');
@@ -2613,6 +2716,59 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
           </div>
 
           <div className="flex-grow p-8 bg-slate-50/50">
+            {prepPhase === 'knowledgeList' && (
+              <div className="animate-in fade-in duration-500">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-800 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-blue-500" /> 课程知识点列表
+                  </h3>
+                  {title === '备课' && (
+                    <button onClick={() => { setSelectedFiles([]); setPrepPhase('upload'); }} className="flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 rounded-lg text-sm font-medium transition-all shadow-sm">
+                      <RefreshCw className="w-4 h-4 mr-2" /> 重新导入大纲 / 重新生成知识点
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {knowledgePointMockData.map((point, idx) => {
+                    const isExpanded = expandedKnowledgePoint === idx;
+                    return (
+                      <div key={idx} className={`border rounded-2xl bg-white overflow-hidden transition-all hover:border-blue-300 hover:shadow-sm ${isExpanded ? 'border-blue-300 shadow-md ring-1 ring-blue-50' : 'border-slate-200'}`}>
+                        <div onClick={() => setExpandedKnowledgePoint(isExpanded ? null : idx)} className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center space-x-4 min-w-0">
+                            <span className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full whitespace-nowrap">{point.chapter}</span>
+                            <span className="font-semibold text-slate-700 text-base truncate">{point.name}</span>
+                          </div>
+                          <ChevronDown className={`w-5 h-5 flex-shrink-0 ml-3 transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-500' : 'text-slate-400'}`} />
+                        </div>
+                        {isExpanded && (
+                          <div className="p-6 border-t border-blue-100 bg-blue-50/20 animate-in fade-in slide-in-from-top-2 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-white rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">教学目标</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.objective}</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">重点难点</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.keyPoints}</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">关联实验</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.experiment}</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-4 border border-blue-100 bg-blue-50/30">
+                                <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2 flex items-center"><Sparkles className="w-3.5 h-3.5 mr-1" /> AI 可辅助内容</p>
+                                <p className="text-sm text-slate-700 leading-relaxed">{point.aiAssist}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {prepPhase === 'upload' && (
               <div className="h-full flex flex-col items-center justify-center min-h-[400px] animate-in fade-in duration-500 py-6">
                 <label className={`border-2 border-dashed border-blue-300 bg-blue-50/50 rounded-3xl p-12 w-full max-w-2xl text-center transition-colors flex flex-col items-center shadow-sm ${selectedFiles.length >= 5 ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-100'}`} onDragOver={(e) => e.preventDefault()} onDrop={selectedFiles.length >= 5 ? (e) => e.preventDefault() : handleFileUpload}>
