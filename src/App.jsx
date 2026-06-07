@@ -1189,9 +1189,24 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
   const [selectedMethods, setSelectedMethods] = useState([]);
   const [uploadedFile, setUploadedFile] = useState(null);
 
-  const knowledgePoints = activeCourse === '第四章第1-5节 频率与相位的测量'
-      ? ['工频测量', '高低频测量', '电动系频率表', '变换式频率表']
-      : ['误差的分类', '绝对误差', '相对误差', '引用误差'];
+  let knowledgePoints;
+  if (activeCourse === '第一章第4-6节 误差的表示和消除') {
+    knowledgePoints = ['误差的分类', '绝对误差', '相对误差', '引用误差'];
+  } else if (activeCourse === '第四章第1-5节 频率与相位的测量') {
+    knowledgePoints = ['工频测量', '高低频测量', '电动系频率表', '变换式频率表'];
+  } else if (activeCourse === '第一章第1-3节 电工仪表与测量的基本方法') {
+    knowledgePoints = ['电工测量的基本概念', '电工仪表的分类', '测量方法', '测量系统分析'];
+  } else if (activeCourse === '第二章第1-2节 电压与电流的测量&磁电系仪表') {
+    knowledgePoints = ['电压测量原理', '电流测量原理', '磁电系仪表结构', '仪表内阻影响'];
+  } else if (activeCourse === '第二章第3-4节 磁电系检流计&电磁系仪表') {
+    knowledgePoints = ['检流计灵敏度', '电磁系仪表结构', '交直流测量', '桥式测量应用'];
+  } else if (activeCourse === '第二章第5-7节 电动系仪表&万用电表') {
+    knowledgePoints = ['电动系仪表原理', '功率测量应用', '万用表结构', '量程选择'];
+  } else if (activeCourse === '第二章第8-10节 直流电位差计&电子系电压表') {
+    knowledgePoints = ['补偿测量原理', '标准电池', '电子电压表特点', '高阻抗测量'];
+  } else {
+    knowledgePoints = ['基本测量原理', '仪表结构', '误差分析', '实际应用'];
+  }
 
   const methodsOptions = [
     { id: '启', label: '启 —— 通过对话引发学生思考，而不直接给答案', icon: Lightbulb },
@@ -1224,8 +1239,18 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
           return caseType === 'project' 
             ? getPlaceholderHTML('大型变电站频率异常排查') 
             : frequencyMeterHTMLTemplate.replace(/PAGE_TITLE/g, '微分型变换式频率测量仪演示').replace(/MODULE_NAME/g, '微分型频率表原理演示');
+      } else if (activeCourse === '第一章第1-3节 电工仪表与测量的基本方法') {
+          return getPlaceholderHTML('电工仪表基础训练模块');
+      } else if (activeCourse === '第二章第1-2节 电压与电流的测量&磁电系仪表') {
+          return getPlaceholderHTML('磁电系电压表电流表校准');
+      } else if (activeCourse === '第二章第3-4节 磁电系检流计&电磁系仪表') {
+          return getPlaceholderHTML('检流计与电磁系仪表实训');
+      } else if (activeCourse === '第二章第5-7节 电动系仪表&万用电表') {
+          return getPlaceholderHTML('电动系仪表与万用表实操');
+      } else if (activeCourse === '第二章第8-10节 直流电位差计&电子系电压表') {
+          return getPlaceholderHTML('直流电位差计与电子电压表');
       }
-      return '';
+      return getPlaceholderHTML(`${activeCourse} 教学案例`);
   };
 
   return (
@@ -1393,8 +1418,6 @@ const IdeologicalImportView = ({ activeCourse, ideologicalState, setIdeologicalS
     ["室温超导争议", "芯片法案破局", "深海探测发现", "火星探测计划"]
   ];
 
-  const isCourseA = activeCourse === '第一章第4-6节 误差的表示和消除';
-
   const optionsA = [
     { title: '底线思维与忧患意识', desc: '在经济或社会系统中，忽视微小的波动往往会导致越过“中产斩杀线”（系统崩溃）。这映射到工程领域，即测量误差如果不受控，一旦突破工程设计的底线，将会带来灾难性后果。' },
     { title: '实事求是', desc: '面对真实的经济数据或严谨的测量数据，必须承认绝对误差的客观存在。不可自欺欺人地掩盖偏差，而应科学评估真实状况，寻找消除和修正误差的真理。' },
@@ -1409,7 +1432,21 @@ const IdeologicalImportView = ({ activeCourse, ideologicalState, setIdeologicalS
     { title: '精益求精的工匠精神', desc: '在航空航天等尖端领域，对相差的测定精度要求甚至达到了微秒级。这种极致的精度追求，正是推动我国核心科技自立自强的大国工匠精神的完美诠释。' }
   ];
 
-  const currentOptions = isCourseA ? optionsA : optionsB;
+  const optionsDefault = [
+    { title: '严谨求实的科学态度', desc: '在电工测量中，数据的准确性是一切工作的基础。这映射到做人做事，要求我们实事求是，追求真理，拒绝虚假。' },
+    { title: '精益求精的工匠精神', desc: '仪表的精度不断提升，代表了人类对完美的追求。在各自岗位上追求卓越，正是大国工匠精神的体现。' },
+    { title: '安全意识与责任担当', desc: '电力系统的测量直接关系到生产安全。我们必须树立安全第一的理念，对每一个数据负责，对每一个生命负责。' },
+    { title: '创新精神与时代担当', desc: '从模拟仪表到数字仪表，技术的创新永无止境。我们要勇于探索，用创新驱动发展，担当起时代赋予的使命。' }
+  ];
+
+  let currentOptions;
+  if (activeCourse === '第一章第4-6节 误差的表示和消除') {
+    currentOptions = optionsA;
+  } else if (activeCourse === '第四章第1-5节 频率与相位的测量') {
+    currentOptions = optionsB;
+  } else {
+    currentOptions = optionsDefault;
+  }
 
   const handleNextTopicSet = () => setTopicSetIndex((prev) => (prev + 1) % hotTopicSets.length);
 
@@ -2596,11 +2633,12 @@ const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, navigateTo, c
 
   const renderTags = (mode, currentCourse) => {
     if (mode === '备课') {
-      const isTargetCourse = currentCourse === '第一章第4-6节 误差的表示和消除' || currentCourse === '第四章第1-5节 频率与相位的测量';
-      const szCount = (isTargetCourse && ideologicalState[currentCourse]?.isCompletedOnce) ? 1 : 0;
+      const courseIndex = courseList.indexOf(currentCourse);
+      const isInteractiveCourse = courseIndex >= 0 && courseIndex < 6; // 前6个可互动课程
+      const szCount = (isInteractiveCourse && ideologicalState[currentCourse]?.isCompletedOnce) ? 1 : 0;
       
       let caseCount = 0;
-      if (isTargetCourse && caseGenerationState[currentCourse]) {
+      if (isInteractiveCourse && caseGenerationState[currentCourse]) {
         if (caseGenerationState[currentCourse].project) caseCount++;
         if (caseGenerationState[currentCourse].circuit) caseCount++;
       }
@@ -3042,22 +3080,42 @@ export default function App() {
 
   // 为每个课程维持独立的全局状态记忆
   const [ideologicalState, setIdeologicalState] = useState({
+    "第一章第1-3节 电工仪表与测量的基本方法": { step: 1, topic: '', knowledge: '电工仪表与测量', selectedRelations: [], isCompletedOnce: false },
     "第一章第4-6节 误差的表示和消除": { step: 1, topic: '', knowledge: '测量误差', selectedRelations: [], isCompletedOnce: false },
+    "第二章第1-2节 电压与电流的测量&磁电系仪表": { step: 1, topic: '', knowledge: '电压与电流', selectedRelations: [], isCompletedOnce: false },
+    "第二章第3-4节 磁电系检流计&电磁系仪表": { step: 1, topic: '', knowledge: '磁电系仪表', selectedRelations: [], isCompletedOnce: false },
+    "第二章第5-7节 电动系仪表&万用电表": { step: 1, topic: '', knowledge: '电动系仪表', selectedRelations: [], isCompletedOnce: false },
+    "第二章第8-10节 直流电位差计&电子系电压表": { step: 1, topic: '', knowledge: '直流电位差计', selectedRelations: [], isCompletedOnce: false },
     "第四章第1-5节 频率与相位的测量": { step: 1, topic: '', knowledge: '频率与相位', selectedRelations: [], isCompletedOnce: false }
   });
 
   const [caseGenerationState, setCaseGenerationState] = useState({
+    "第一章第1-3节 电工仪表与测量的基本方法": { project: false, circuit: false },
     "第一章第4-6节 误差的表示和消除": { project: false, circuit: false },
+    "第二章第1-2节 电压与电流的测量&磁电系仪表": { project: false, circuit: false },
+    "第二章第3-4节 磁电系检流计&电磁系仪表": { project: false, circuit: false },
+    "第二章第5-7节 电动系仪表&万用电表": { project: false, circuit: false },
+    "第二章第8-10节 直流电位差计&电子系电压表": { project: false, circuit: false },
     "第四章第1-5节 频率与相位的测量": { project: false, circuit: false }
   });
 
   const [homeworkState, setHomeworkState] = useState({
+    "第一章第1-3节 电工仪表与测量的基本方法": false,
     "第一章第4-6节 误差的表示和消除": false,
+    "第二章第1-2节 电压与电流的测量&磁电系仪表": false,
+    "第二章第3-4节 磁电系检流计&电磁系仪表": false,
+    "第二章第5-7节 电动系仪表&万用电表": false,
+    "第二章第8-10节 直流电位差计&电子系电压表": false,
     "第四章第1-5节 频率与相位的测量": false
   });
 
   const [evaluationState, setEvaluationState] = useState({
+    "第一章第1-3节 电工仪表与测量的基本方法": false,
     "第一章第4-6节 误差的表示和消除": false,
+    "第二章第1-2节 电压与电流的测量&磁电系仪表": false,
+    "第二章第3-4节 磁电系检流计&电磁系仪表": false,
+    "第二章第5-7节 电动系仪表&万用电表": false,
+    "第二章第8-10节 直流电位差计&电子系电压表": false,
     "第四章第1-5节 频率与相位的测量": false
   });
 
