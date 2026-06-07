@@ -1227,7 +1227,7 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
     setTimeout(() => {
       setStep(3);
       if (setCaseGenerationState) {
-        setCaseGenerationState(activeCourse, prev => ({ ...prev, [caseType]: true }));
+        setCaseGenerationState(prev => ({ ...prev, [caseType]: true }));
       }
     }, 2500);
   };
@@ -1254,7 +1254,7 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto h-full overflow-y-auto pb-12 pr-2 custom-scrollbar">
+    <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar">
       {step === 1 && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-500">
           <div className="p-6 border-b border-slate-100 bg-slate-50">
@@ -1477,7 +1477,7 @@ const IdeologicalImportView = ({ activeCourse, ideologicalState, setIdeologicalS
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto h-full overflow-y-auto pb-12 pr-2 custom-scrollbar flex flex-col items-center">
+    <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar flex flex-col items-center">
       <div className="w-full max-w-3xl mb-8 flex justify-between items-center text-sm font-medium text-slate-400 relative">
         <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2"></div>
         <div className="absolute top-1/2 left-0 h-0.5 bg-blue-500 -z-10 -translate-y-1/2 transition-all duration-500" style={{ width: step >= 5 ? '100%' : step >= 3 ? '50%' : '0%' }}></div>
@@ -1718,7 +1718,7 @@ const ClassroomEvaluationView = ({ activeCourse }) => {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto h-full overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
+    <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center">
           <div className="bg-blue-50 p-4 rounded-xl mr-4"><Users className="w-8 h-8 text-blue-500" /></div>
@@ -1850,7 +1850,7 @@ const AIGeneratorView = ({ actionName, courseName }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col h-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-6 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div className="flex-1 w-full">
           <label className="block text-sm font-semibold text-slate-700 mb-2">定制化要求 (可选)</label>
@@ -1918,7 +1918,7 @@ const EvaluationReportView = ({ activeCourse }) => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto h-full overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
       
       <div className="mb-8">
         <h2 className="text-2xl font-extrabold text-slate-800 flex items-center">
@@ -2240,7 +2240,7 @@ const HomeworkAssignmentView = ({ activeCourse, isAssigned, setAssigned }) => {
   const isCourseA = activeCourse === '第一章第4-6节 误差的表示和消除';
 
   return (
-    <div className="w-full max-w-6xl mx-auto h-full overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
           <div><p className="text-sm text-slate-500 font-medium mb-1">班级总人数</p><h3 className="text-3xl font-bold text-slate-800">{stats.total} <span className="text-sm font-normal text-slate-500 ml-1">人</span></h3></div>
@@ -3036,17 +3036,17 @@ const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateTo, ideo
             </button>
           </div>
           
-          <div className={`flex-grow flex flex-col text-slate-400 bg-slate-50/50 ${iframeContent ? 'p-0 overflow-hidden' : 'p-6 items-center justify-center'}`}>
+          <div className={`flex-grow flex flex-col text-slate-400 bg-slate-50/50 ${iframeContent ? 'p-0 overflow-hidden' : 'p-6'}`}>
             {iframeContent ? (
               <iframe srcDoc={iframeContent} className="w-full h-full min-h-[850px] border-none" title={actionName} sandbox="allow-scripts allow-same-origin" />
             ) : actionName === '评价结果' ? (
-              <div className="w-full h-full flex flex-col">
+              <div className="w-full flex-1 min-h-0 flex flex-col">
                 <EvaluationReportView activeCourse={activeCourse} />
               </div>
             ) : actionName === '课堂评价' ? (
-              <div className="w-full h-full flex flex-col"><ClassroomEvaluationView activeCourse={activeCourse} /></div>
+              <div className="w-full flex-1 min-h-0 flex flex-col"><ClassroomEvaluationView activeCourse={activeCourse} /></div>
             ) : actionName === '布置作业' ? (
-              <div className="w-full h-full flex flex-col">
+              <div className="w-full flex-1 min-h-0 flex flex-col">
                 <HomeworkAssignmentView 
                   activeCourse={activeCourse} 
                   isAssigned={homeworkState && homeworkState[activeCourse]} 
@@ -3054,15 +3054,15 @@ const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateTo, ideo
                 />
               </div>
             ) : actionName === '思政导入' ? (
-              <div className="w-full h-full flex flex-col">
+              <div className="w-full flex-1 min-h-0 flex flex-col">
                 <IdeologicalImportView activeCourse={activeCourse} ideologicalState={ideologicalState[activeCourse]} setIdeologicalState={(updater) => updateIdeologicalState(activeCourse, updater)} />
               </div>
             ) : actionName === '案例生成' ? (
-              <div className="w-full h-full flex flex-col">
+              <div className="w-full flex-1 min-h-0 flex flex-col">
                 <CaseGenerationView activeCourse={activeCourse} setCaseGenerationState={(updater) => updateCaseGenerationState(activeCourse, updater)} />
               </div>
             ) : (
-              <div className="w-full h-full flex flex-col"><AIGeneratorView actionName={actionName} courseName={activeCourse} /></div>
+              <div className="w-full flex-1 min-h-0 flex flex-col"><AIGeneratorView actionName={actionName} courseName={activeCourse} /></div>
             )}
           </div>
         </div>
