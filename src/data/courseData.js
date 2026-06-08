@@ -71,6 +71,58 @@ export const knowledgePointMockData = [
   }
 ];
 
+export const initialIdeologicalState = {
+  "第一章第1-3节 电工仪表与测量的基本方法": {
+    step: 5,
+    topic: "春晚机器人",
+    knowledge: "测量方法的分类",
+    selectedRelations: ["严谨求实的科学态度", "创新精神与时代担当"],
+    isCompletedOnce: true
+  },
+  "第一章第4-6节 误差的表示和消除": {
+    step: 5,
+    topic: "美国中产斩杀线",
+    knowledge: "测量误差",
+    selectedRelations: ["底线思维与忧患意识", "实事求是"],
+    isCompletedOnce: true
+  },
+  "第二章第1-2节 电压与电流的测量&磁电系仪表": {
+    step: 5,
+    topic: "新能源汽车出海",
+    knowledge: "仪表内阻影响",
+    selectedRelations: ["安全意识与责任担当", "精益求精的工匠精神"],
+    isCompletedOnce: true
+  },
+  "第二章第3-4节 磁电系检流计&电磁系仪表": {
+    step: 5,
+    topic: "深海探测发现",
+    knowledge: "检流计灵敏度",
+    selectedRelations: ["严谨求实的科学态度", "精益求精的工匠精神"],
+    isCompletedOnce: true
+  },
+  "第二章第5-7节 电动系仪表&万用电表": {
+    step: 5,
+    topic: "脑机接口落地",
+    knowledge: "量程选择",
+    selectedRelations: ["创新精神与时代担当", "安全意识与责任担当"],
+    isCompletedOnce: true
+  },
+  "第二章第8-10节 直流电位差计&电子系电压表": {
+    step: 5,
+    topic: "量子计算突破",
+    knowledge: "补偿测量原理",
+    selectedRelations: ["精益求精的工匠精神", "创新精神与时代担当"],
+    isCompletedOnce: true
+  },
+  "第四章第1-5节 频率与相位的测量": {
+    step: 1,
+    topic: "",
+    knowledge: "频率与相位",
+    selectedRelations: [],
+    isCompletedOnce: false
+  }
+};
+
 // --- 教学引导数据 ---
 export const teachingGuides = {
   "第一章第1-3节 电工仪表与测量的基本方法": {

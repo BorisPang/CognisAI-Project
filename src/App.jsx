@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, ClipboardCheck, MonitorPlay } from 'lucide-react';
+import { initialIdeologicalState } from './data/courseData.js';
 import { ActionDetailView, HomeView, Navbar, SubPageView } from './views/AppViews.jsx';
 
 export default function App() {
@@ -10,15 +11,7 @@ export default function App() {
   const [isCourseBuilt, setIsCourseBuilt] = useState(false);
 
   // 为每个课程维持独立的全局状态记忆
-  const [ideologicalState, setIdeologicalState] = useState({
-    "第一章第1-3节 电工仪表与测量的基本方法": { step: 1, topic: '', knowledge: '电工仪表与测量', selectedRelations: [], isCompletedOnce: false },
-    "第一章第4-6节 误差的表示和消除": { step: 1, topic: '', knowledge: '测量误差', selectedRelations: [], isCompletedOnce: false },
-    "第二章第1-2节 电压与电流的测量&磁电系仪表": { step: 1, topic: '', knowledge: '电压与电流', selectedRelations: [], isCompletedOnce: false },
-    "第二章第3-4节 磁电系检流计&电磁系仪表": { step: 1, topic: '', knowledge: '磁电系仪表', selectedRelations: [], isCompletedOnce: false },
-    "第二章第5-7节 电动系仪表&万用电表": { step: 1, topic: '', knowledge: '电动系仪表', selectedRelations: [], isCompletedOnce: false },
-    "第二章第8-10节 直流电位差计&电子系电压表": { step: 1, topic: '', knowledge: '直流电位差计', selectedRelations: [], isCompletedOnce: false },
-    "第四章第1-5节 频率与相位的测量": { step: 1, topic: '', knowledge: '频率与相位', selectedRelations: [], isCompletedOnce: false }
-  });
+  const [ideologicalState, setIdeologicalState] = useState(initialIdeologicalState);
 
   const [caseGenerationState, setCaseGenerationState] = useState({
     "第一章第1-3节 电工仪表与测量的基本方法": { project: false, circuit: false },
