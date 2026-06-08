@@ -1556,7 +1556,6 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
   
   const [expandedCourseOutline, setExpandedCourseOutline] = useState(null);
   const [expandedKnowledgePoint, setExpandedKnowledgePoint] = useState(null);
-  const [expandedCourseCard, setExpandedCourseCard] = useState(null);
   
   const [knowledgePoints, setKnowledgePoints] = useState({
       "第一章第1-3节 电工仪表与测量的基本方法": "电工测量的基本概念与任务\n电工仪表的分类与基本组成\n测量方法的分类：直接测量、间接测量、比较测量\n测量系统的组成与测量过程分析",
@@ -1840,7 +1839,6 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {courseList.map((course, idx) => {
-                    const isExpanded = expandedCourseCard === idx;
                     const points = knowledgePoints[course] ? knowledgePoints[course].split('\n') : [];
                     const isLocked = idx >= 6; // 第三章开始（索引6）锁定
                     
@@ -1858,8 +1856,8 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
                             <span className="text-xs bg-slate-200 px-2 py-0.5 rounded-full">已锁定</span>
                           </div>
                           
-                          {isExpanded && points.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-slate-200 animate-in fade-in slide-in-from-top-2">
+                          {points.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-slate-200">
                               <div className="flex flex-wrap gap-2">
                                 {points.map((point, pIdx) => (
                                   <span 
@@ -1884,23 +1882,10 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
                         onClick={() => handleCourseClick(course)}
                         className="p-4 rounded-xl border bg-white text-slate-700 flex flex-col justify-between transition-all duration-300 border-slate-200 hover:border-teal-400 hover:shadow-md cursor-pointer hover:-translate-y-1"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="text-sm font-medium leading-relaxed">{course}</div>
-                          {points.length > 0 && (
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedCourseCard(isExpanded ? null : idx);
-                              }} 
-                              className="text-slate-400 hover:text-slate-600 p-0.5"
-                            >
-                              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-teal-500' : ''}`} />
-                            </button>
-                          )}
-                        </div>
-                        
-                        {isExpanded && points.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+                        <div className="text-sm font-medium leading-relaxed">{course}</div>
+
+                        {points.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-100">
                             <div className="flex flex-wrap gap-2">
                               {points.map((point, pIdx) => (
                                 <span 
