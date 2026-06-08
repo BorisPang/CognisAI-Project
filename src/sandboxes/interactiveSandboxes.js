@@ -30,6 +30,44 @@ export const getPlaceholderHTML = (moduleName) => `<!DOCTYPE html>
 
 // --- 嵌入的 HTML 模块数据 ---
 
+// 后续新生成的案例统一复用这套 AI 引导提示弹窗。
+const aiGuidanceModalStyles = `
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.82); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-box { background: #29446f; border: 2px solid #2f80ed; border-radius: 14px; width: min(76vw, 760px); padding: 44px 42px; text-align: center; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.42); color: #dbeafe; }
+        .modal-icon { font-size: 58px; margin-bottom: 20px; }
+        .modal-title { font-size: 28px; margin: 0 0 24px; color: #fb7185; font-weight: 900; }
+        .modal-text { font-size: 17px; line-height: 1.8; color: #dbeafe; margin-bottom: 30px; text-align: center; }
+        .modal-box.error { border-color: #2f80ed; }
+        .btn-modal { background: #4967a0; color: white; border: none; font-size: 18px; padding: 12px 42px; border-radius: 6px; cursor: pointer; font-weight: 800; }
+        .btn-modal:hover { background: #5a76ad; }
+`;
+
+const aiGuidanceModalHTML = `
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal-box error" id="modalBox">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h2 class="modal-title" id="modalTitle">AI 引导提示：请重新思考</h2>
+            <div class="modal-text" id="modalText">这里是提示内容...</div>
+            <button class="btn-modal" id="modalBtn" onclick="closeModal()">返回重选</button>
+        </div>
+    </div>
+`;
+
+const aiGuidanceModalScript = `
+        function showGuidanceModal(message) {
+            document.getElementById('modalIcon').innerText = '⚠️';
+            document.getElementById('modalTitle').innerText = 'AI 引导提示：请重新思考';
+            document.getElementById('modalText').innerText = message;
+            document.getElementById('modalBtn').innerText = '返回重选';
+            document.getElementById('aiModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('aiModal').style.display = 'none';
+            Array.from(document.querySelectorAll('.option.wrong')).forEach(btn => btn.classList.remove('wrong'));
+        }
+`;
+
 // 1. 第一章第1-3节：电工测量方法排障项目案例
 export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -91,6 +129,7 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
         .btn:disabled { opacity: .45; cursor: not-allowed; }
         .feedback { min-height: 48px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; color: var(--muted); border: 1px dashed #cbd5e1; line-height: 1.6; }
         .complete { background: #ecfdf5; border-color: #bbf7d0; color: #166534; font-weight: 800; }
+${aiGuidanceModalStyles}
         @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .meter { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -156,6 +195,7 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
             </section>
         </main>
     </div>
+${aiGuidanceModalHTML}
 
     <script>
         const moduleName = '电工测量方法排障实训';
@@ -169,7 +209,8 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
                     '把万用表量程调到最大，读数自然会更稳定。'
                 ],
                 answer: 1,
-                feedback: '正确。电工测量首先要明确被测对象和被测量，否则同样是“电压”，测点不同就可能得到完全不同的工程含义。'
+                feedback: '正确。电工测量首先要明确被测对象和被测量，否则同样是“电压”，测点不同就可能得到完全不同的工程含义。',
+                wrongFeedback: '我们需要先确认“到底测的是什么”。请回到现场测点，区分电源端电压、负载端电压和回路压降，不要直接把报警归因于设备损坏。'
             },
             {
                 title: '第二问：选择合适测量方法',
@@ -180,7 +221,8 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
                     '只看 PLC 是否报警，不再需要物理测量。'
                 ],
                 answer: 0,
-                feedback: '正确。直接测量适合快速判断，比较测量适合校准与溯源，可以帮助区分真实电压异常与仪表/接线引入的误差。'
+                feedback: '正确。直接测量适合快速判断，比较测量适合校准与溯源，可以帮助区分真实电压异常与仪表/接线引入的误差。',
+                wrongFeedback: '这一步要判断“读数偏低是不是真的”。请找能校验手持表可信度的数据，例如标准源或更高准确度仪表的比较测量结果。'
             },
             {
                 title: '第三问：判断仪表类型与接入影响',
@@ -191,7 +233,8 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
                     '显示屏刷新率，刷新越快读数越真实。'
                 ],
                 answer: 1,
-                feedback: '正确。仪表不是“透明观察者”，它接入电路后可能改变被测对象状态。选择仪表时要关注输入阻抗、准确度等级、量程和接入方式。'
+                feedback: '正确。仪表不是“透明观察者”，它接入电路后可能改变被测对象状态。选择仪表时要关注输入阻抗、准确度等级、量程和接入方式。',
+                wrongFeedback: '请重新思考仪表接入电路后会不会改变被测对象。这里要关注输入阻抗、准确度等级、量程和接入方式，而不是外观或刷新速度。'
             },
             {
                 title: '第四问：形成完整测量系统诊断',
@@ -202,13 +245,16 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
                     '忽略标准源和 PLC 信息，只凭手持表读数写报告。'
                 ],
                 answer: 1,
-                feedback: '完整。你把测量对象、测量方法、仪表特性和测量系统组成串联起来，完成了从读数异常到工程诊断的闭环。'
+                feedback: '完整。你把测量对象、测量方法、仪表特性和测量系统组成串联起来，完成了从读数异常到工程诊断的闭环。',
+                wrongFeedback: '最终结论不能只盯一个读数。请把传感器、导线、测点、仪表、接线方式和标准源校验串成完整测量链，再判断异常来源。'
             }
         ];
 
         let currentStage = 0;
         let answered = false;
         let assistantCalled = false;
+
+${aiGuidanceModalScript}
 
         function render() {
             const stage = stages[currentStage];
@@ -246,15 +292,22 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
 
         function choose(index) {
             if (answered) return;
-            answered = true;
             const stage = stages[currentStage];
-            Array.from(document.querySelectorAll('.option')).forEach((btn, i) => {
+            const optionButtons = Array.from(document.querySelectorAll('.option'));
+            optionButtons.forEach(btn => btn.classList.remove('wrong'));
+            if (index !== stage.answer) {
+                optionButtons[index].classList.add('wrong');
+                document.getElementById('feedback').innerText = 'AI 助教已给出引导提示，请返回重选。';
+                showGuidanceModal(stage.wrongFeedback);
+                return;
+            }
+            answered = true;
+            optionButtons.forEach((btn, i) => {
                 btn.disabled = true;
                 if (i === stage.answer) btn.classList.add('correct');
-                if (i === index && i !== stage.answer) btn.classList.add('wrong');
             });
             const feedback = document.getElementById('feedback');
-            feedback.innerText = index === stage.answer ? stage.feedback : '这一步还不够稳。AI 助教提示：正确路径是先控制变量，再用测量方法和仪表特性去验证读数来源。' + ' ' + stage.feedback;
+            feedback.innerText = stage.feedback;
             document.getElementById('nextBtn').disabled = false;
         }
 
