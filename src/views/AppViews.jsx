@@ -2,13 +2,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { BookOpen, MonitorPlay, ClipboardCheck, ArrowRight, BrainCircuit, User, Bell, Search, BarChart3, ChevronRight, X, FileText, CheckCircle, Wrench, FileQuestion, Sparkles, Loader2, Lock, AlertCircle, TrendingUp, Users, Target, CheckCircle2, Clock, FileSpreadsheet, ChevronDown, ChevronUp, UploadCloud, RefreshCw, CheckSquare, Presentation, Lightbulb, ArrowDownToLine, Layers, Settings2, Send, MessageSquare, Activity } from 'lucide-react';
 import { courseList, knowledgeModules, knowledgePointMockData, radarDimensions, studentRadarData, teachingGuides } from '../data/courseData';
 import { generateWithGemini } from '../services/gemini';
-import { frequencyMeterHTMLTemplate, getPlaceholderHTML, ghostTrippingHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
+import { basicMeasurementTroubleshootingHTML, frequencyMeterHTMLTemplate, getPlaceholderHTML, ghostTrippingHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
 
 // --- 动态获取弹窗选项 ---
 const getModalOptions = (title, course) => {
   if (title === '备课') return [{ label: '思政导入', path: '备课-思政导入', icon: BookOpen }, { label: '案例生成', path: '备课-案例生成', icon: FileText }];
   if (title === '课后') return [{ label: '布置作业', path: '课后-布置作业', icon: FileQuestion }, { label: '评价结果', path: '课后-评价结果', icon: BarChart3 }];
   if (title === '上课') {
+    if (course === '第一章第1-3节 电工仪表与测量的基本方法') {
+      return [
+        { label: '电工测量方法排障实训', path: '上课-电工测量方法排障实训', icon: Wrench }
+      ];
+    }
     if (course === '第一章第4-6节 误差的表示和消除') {
       return [
         { label: '智能工厂配电系统故障诊断', path: '上课-智能工厂配电系统故障诊断', icon: Wrench }, 
@@ -248,7 +253,9 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
             ? getPlaceholderHTML('大型变电站频率异常排查') 
             : frequencyMeterHTMLTemplate.replace(/PAGE_TITLE/g, '微分型变换式频率测量仪演示').replace(/MODULE_NAME/g, '微分型频率表原理演示');
       } else if (activeCourse === '第一章第1-3节 电工仪表与测量的基本方法') {
-          return getPlaceholderHTML('电工仪表基础训练模块');
+          return caseType === 'project'
+            ? basicMeasurementTroubleshootingHTML
+            : getPlaceholderHTML('电工仪表基础电路模型');
       } else if (activeCourse === '第二章第1-2节 电压与电流的测量&磁电系仪表') {
           return getPlaceholderHTML('磁电系电压表电流表校准');
       } else if (activeCourse === '第二章第3-4节 磁电系检流计&电磁系仪表') {
@@ -1981,7 +1988,8 @@ export const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateT
   const ParentIcon = parentInfo.icon;
 
   let iframeContent = null;
-  if (actionName === '智能工厂配电系统故障诊断') iframeContent = ghostTrippingHTML;
+  if (actionName === '电工测量方法排障实训') iframeContent = basicMeasurementTroubleshootingHTML;
+  else if (actionName === '智能工厂配电系统故障诊断') iframeContent = ghostTrippingHTML;
   else if (actionName === '电压表出厂校验闯关') iframeContent = voltmeterSimHTML;
   else if (actionName === '微分型频率表原理演示') iframeContent = frequencyMeterHTMLTemplate.replace(/PAGE_TITLE/g, '微分型频率表原理演示').replace(/MODULE_NAME/g, '微分型频率表原理演示');
   else if (actionName === '相序与相位差测定') iframeContent = getPlaceholderHTML('相序与相位差测定');

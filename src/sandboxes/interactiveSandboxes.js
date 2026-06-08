@@ -30,6 +30,263 @@ export const getPlaceholderHTML = (moduleName) => `<!DOCTYPE html>
 
 // --- 嵌入的 HTML 模块数据 ---
 
+// 1. 第一章第1-3节：电工测量方法排障项目案例
+export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>电工测量方法排障实训 - AI 助教递进式诊断</title>
+    <style>
+        :root {
+            --bg: #f8fafc; --panel: #ffffff; --ink: #1e293b; --muted: #64748b;
+            --line: #dbe4ef; --blue: #2563eb; --teal: #0f766e; --amber: #d97706;
+            --green: #16a34a; --red: #dc2626;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "PingFang SC", sans-serif; }
+        .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
+        .hero { background: linear-gradient(135deg, #1d4ed8, #0f766e); color: white; border-radius: 18px; padding: 26px 30px; box-shadow: 0 18px 45px rgba(37, 99, 235, 0.18); }
+        .hero h1 { margin: 0 0 10px; font-size: 26px; }
+        .hero p { margin: 0; color: rgba(255,255,255,.85); line-height: 1.7; }
+        .layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 22px; margin-top: 22px; align-items: stretch; }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); overflow: hidden; }
+        .card-header { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .card-header h2 { font-size: 18px; margin: 0; }
+        .tag { font-size: 12px; color: var(--blue); background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 8px; border-radius: 999px; font-weight: 700; white-space: nowrap; }
+        .scene { padding: 20px; display: grid; gap: 16px; }
+        .diagram { border: 1px solid #cbd5e1; border-radius: 14px; background: linear-gradient(180deg, #f8fafc, #eef6ff); padding: 20px; min-height: 260px; position: relative; }
+        .bus { height: 10px; background: #334155; border-radius: 99px; margin: 34px 28px 22px; position: relative; }
+        .node { position: absolute; top: -18px; width: 46px; height: 46px; border-radius: 999px; background: white; border: 3px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; box-shadow: 0 8px 18px rgba(2, 132, 199, .18); }
+        .n1 { left: 8%; } .n2 { left: 44%; border-color: #f59e0b; } .n3 { right: 8%; border-color: #22c55e; }
+        .meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 48px; }
+        .meter-box { border: 1px solid #dbe4ef; background: white; border-radius: 12px; padding: 14px; }
+        .meter-box strong { display: block; font-size: 13px; margin-bottom: 8px; color: #475569; }
+        .reading { font-size: 22px; font-weight: 900; color: #0f172a; }
+        .bad { color: var(--red); } .warn { color: var(--amber); } .ok { color: var(--green); }
+        .log { background: #0f172a; color: #dbeafe; border-radius: 12px; padding: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.75; }
+        .log b { color: #fde68a; }
+        .knowledge { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 20px; }
+        .knowledge span { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .coach { display: flex; flex-direction: column; min-height: 100%; }
+        .coach-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+        .progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .dot { height: 8px; border-radius: 999px; background: #e2e8f0; }
+        .dot.active { background: var(--blue); }
+        .call-ai { width: 100%; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .call-ai:hover { background: #1e293b; }
+        .ai-box { border-left: 4px solid var(--blue); background: #eff6ff; border-radius: 0 12px 12px 0; padding: 16px; line-height: 1.7; color: #1e3a8a; }
+        .stage-title { margin: 0; font-size: 20px; color: #0f172a; }
+        .options { display: grid; gap: 10px; }
+        .option { width: 100%; text-align: left; border: 2px solid #e2e8f0; background: white; border-radius: 12px; padding: 14px 15px; cursor: pointer; color: #334155; font-size: 15px; line-height: 1.55; transition: .18s; }
+        .option:hover { border-color: #93c5fd; background: #f8fbff; }
+        .option.correct { border-color: var(--green); background: #ecfdf5; color: #166534; font-weight: 800; }
+        .option.wrong { border-color: var(--red); background: #fef2f2; color: #991b1b; }
+        .option:disabled { cursor: not-allowed; opacity: .75; }
+        .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: auto; }
+        .btn { border: 0; border-radius: 11px; padding: 12px 16px; cursor: pointer; font-weight: 800; transition: .18s; }
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .feedback { min-height: 48px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; color: var(--muted); border: 1px dashed #cbd5e1; line-height: 1.6; }
+        .complete { background: #ecfdf5; border-color: #bbf7d0; color: #166534; font-weight: 800; }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .meter { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="hero">
+            <h1>智能产线测量异常排障：仪表基础与测量方法选择</h1>
+            <p>背景：某柔性装配线的 24V 传感器供电回路频繁误报欠压，学生需要调用 AI 助教，从测量对象、仪表类型、测量方法与测量系统组成四个层面逐步定位问题。</p>
+        </section>
+
+        <main class="layout">
+            <section class="card">
+                <div class="card-header">
+                    <h2>现场图文场景</h2>
+                    <span class="tag">知识点：测量方法 / 仪表分类 / 测量系统</span>
+                </div>
+                <div class="scene">
+                    <div class="diagram">
+                        <div class="bus">
+                            <div class="node n1">PLC</div>
+                            <div class="node n2">S2</div>
+                            <div class="node n3">LOAD</div>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-box"><strong>万用表直接测量</strong><div class="reading bad">18.6 V</div></div>
+                            <div class="meter-box"><strong>标准源比较测量</strong><div class="reading ok">24.1 V</div></div>
+                            <div class="meter-box"><strong>回路工作电流</strong><div class="reading warn">0.42 A</div></div>
+                        </div>
+                    </div>
+                    <div class="log">
+                        [09:20:11] WARN  S2 sensor undervoltage alarm<br>
+                        [09:20:14] INFO  PLC input status normal<br>
+                        [09:20:21] <b>NOTE</b> handheld meter probe connected across load while line is energized<br>
+                        [09:20:30] CHECK standard source output: 24.1V stable<br>
+                        [09:21:02] TODO  verify method, meter category, and measurement chain
+                    </div>
+                </div>
+                <div class="knowledge">
+                    <span>电工测量的基本概念</span>
+                    <span>电工仪表的分类</span>
+                    <span>直接测量 / 比较测量</span>
+                    <span>测量系统分析</span>
+                </div>
+            </section>
+
+            <section class="card coach">
+                <div class="card-header">
+                    <h2>AI 助教递进式排障</h2>
+                    <span class="tag" id="stageLabel">第 1 / 4 问</span>
+                </div>
+                <div class="coach-body">
+                    <div class="progress" id="progress"></div>
+                    <button class="btn call-ai" id="callAiBtn">一键呼叫 AI 助教</button>
+                    <h3 class="stage-title" id="stageTitle"></h3>
+                    <div class="ai-box" id="aiPrompt"></div>
+                    <div class="options" id="options"></div>
+                    <div class="feedback" id="feedback">点击选项后，AI 助教会给出下一步排障提示。</div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="resetBtn">重新排障</button>
+                        <button class="btn btn-primary" id="nextBtn" disabled>下一问</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const moduleName = '电工测量方法排障实训';
+        const stages = [
+            {
+                title: '第一问：先确认测量对象',
+                prompt: 'AI 助教：现场同时出现万用表读数偏低、PLC 输入正常、标准源输出稳定。第一步应该先确认什么，才能避免盲目换设备？',
+                options: [
+                    '直接更换传感器 S2，因为报警一定来自传感器损坏。',
+                    '确认测量对象和被测量：到底是在测电源端电压、负载端电压，还是回路压降。',
+                    '把万用表量程调到最大，读数自然会更稳定。'
+                ],
+                answer: 1,
+                feedback: '正确。电工测量首先要明确被测对象和被测量，否则同样是“电压”，测点不同就可能得到完全不同的工程含义。'
+            },
+            {
+                title: '第二问：选择合适测量方法',
+                prompt: 'AI 助教：直接用手持表测得 18.6V，但标准源比较测量显示 24.1V。为了验证手持表读数是否可信，下一步最合适的方法是什么？',
+                options: [
+                    '采用比较测量：用标准源或已知准确度仪表对手持表读数进行校验。',
+                    '继续直接测量 10 次，取平均值即可消除所有系统误差。',
+                    '只看 PLC 是否报警，不再需要物理测量。'
+                ],
+                answer: 0,
+                feedback: '正确。直接测量适合快速判断，比较测量适合校准与溯源，可以帮助区分真实电压异常与仪表/接线引入的误差。'
+            },
+            {
+                title: '第三问：判断仪表类型与接入影响',
+                prompt: 'AI 助教：手持表跨接在负载两端时，回路电流和接触状态发生波动。这里最需要关注哪个仪表特性？',
+                options: [
+                    '外壳颜色，因为不同颜色代表不同精度。',
+                    '仪表输入阻抗、准确度等级和接入方式对被测电路的影响。',
+                    '显示屏刷新率，刷新越快读数越真实。'
+                ],
+                answer: 1,
+                feedback: '正确。仪表不是“透明观察者”，它接入电路后可能改变被测对象状态。选择仪表时要关注输入阻抗、准确度等级、量程和接入方式。'
+            },
+            {
+                title: '第四问：形成完整测量系统诊断',
+                prompt: 'AI 助教：现在你要给出最终处置建议。哪一个结论最符合“测量系统分析”的思路？',
+                options: [
+                    '只记录最低读数 18.6V，并判定供电系统失效。',
+                    '把传感器、导线、测点、仪表、接线方式和标准源校验串成测量链，定位异常来自测点接触和直接测量方式不当。',
+                    '忽略标准源和 PLC 信息，只凭手持表读数写报告。'
+                ],
+                answer: 1,
+                feedback: '完整。你把测量对象、测量方法、仪表特性和测量系统组成串联起来，完成了从读数异常到工程诊断的闭环。'
+            }
+        ];
+
+        let currentStage = 0;
+        let answered = false;
+        let assistantCalled = false;
+
+        function render() {
+            const stage = stages[currentStage];
+            answered = false;
+            document.getElementById('progress').innerHTML = stages.map((_, index) => '<div class="dot ' + (assistantCalled && index <= currentStage ? 'active' : '') + '"></div>').join('');
+            if (!assistantCalled) {
+                document.getElementById('stageLabel').innerText = '待开始';
+                document.getElementById('stageTitle').innerText = '现场异常已加载';
+                document.getElementById('aiPrompt').innerText = '点击“一键呼叫 AI 助教”，系统会把这个项目案例拆成 4 个递进排障问题，引导学生从测量对象一路分析到测量系统。';
+                document.getElementById('options').innerHTML = '';
+                document.getElementById('feedback').className = 'feedback';
+                document.getElementById('feedback').innerText = '等待学生呼叫 AI 助教。';
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('nextBtn').innerText = '下一问';
+                document.getElementById('callAiBtn').disabled = false;
+                document.getElementById('callAiBtn').innerText = '一键呼叫 AI 助教';
+                return;
+            }
+            document.getElementById('stageLabel').innerText = '第 ' + (currentStage + 1) + ' / ' + stages.length + ' 问';
+            document.getElementById('stageTitle').innerText = stage.title;
+            document.getElementById('aiPrompt').innerText = stage.prompt;
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerText = '点击选项后，AI 助教会给出下一步排障提示。';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').innerText = currentStage === stages.length - 1 ? '完成实训' : '下一问';
+            document.getElementById('callAiBtn').disabled = true;
+            document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
+            document.getElementById('options').innerHTML = stage.options.map((option, index) =>
+                '<button class="option" data-index="' + index + '">' + option + '</button>'
+            ).join('');
+            Array.from(document.querySelectorAll('.option')).forEach(btn => {
+                btn.addEventListener('click', () => choose(Number(btn.dataset.index)));
+            });
+        }
+
+        function choose(index) {
+            if (answered) return;
+            answered = true;
+            const stage = stages[currentStage];
+            Array.from(document.querySelectorAll('.option')).forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === stage.answer) btn.classList.add('correct');
+                if (i === index && i !== stage.answer) btn.classList.add('wrong');
+            });
+            const feedback = document.getElementById('feedback');
+            feedback.innerText = index === stage.answer ? stage.feedback : '这一步还不够稳。AI 助教提示：正确路径是先控制变量，再用测量方法和仪表特性去验证读数来源。' + ' ' + stage.feedback;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStage < stages.length - 1) {
+                currentStage += 1;
+                render();
+            } else {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback complete';
+                feedback.innerText = '实训完成：已记录“电工测量方法排障实训”。你已经掌握从测量对象到测量系统的递进排障链路。';
+                document.getElementById('nextBtn').disabled = true;
+                if (window.parent) window.parent.postMessage({ type: 'MODULE_COMPLETED', module: moduleName }, '*');
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            currentStage = 0;
+            assistantCalled = false;
+            render();
+        });
+
+        document.getElementById('callAiBtn').addEventListener('click', () => {
+            assistantCalled = true;
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>`;
+
 // 1. 第一章：配电系统故障诊断沙盘
 export const ghostTrippingHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
