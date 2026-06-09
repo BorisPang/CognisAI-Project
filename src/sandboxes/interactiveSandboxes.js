@@ -83,9 +83,9 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
         * { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "PingFang SC", sans-serif; }
         .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
-        .hero { background: linear-gradient(135deg, #1d4ed8, #0f766e); color: white; border-radius: 18px; padding: 26px 30px; box-shadow: 0 18px 45px rgba(37, 99, 235, 0.18); }
-        .hero h1 { margin: 0 0 10px; font-size: 26px; }
-        .hero p { margin: 0; color: rgba(255,255,255,.85); line-height: 1.7; }
+        .hero { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-left: 5px solid var(--teal); border-radius: 16px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
+        .hero h1 { margin: 0 0 10px; font-size: 26px; color: #0f172a; }
+        .hero p { margin: 0; color: var(--muted); line-height: 1.7; }
         .layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 22px; margin-top: 22px; align-items: stretch; }
         .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); overflow: hidden; }
         .card-header { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
