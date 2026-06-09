@@ -30,6 +30,37 @@ const getModalOptions = (title, course) => {
   return [];
 };
 
+const hasGeneratedCase = (courseState) => Boolean(courseState && (courseState.project || courseState.circuit));
+
+const getGeneratedCaseSummaries = (activeCourse, generatedCaseState = {}) => {
+  const cases = [];
+  if (generatedCaseState.project) {
+    const projectTitleMap = {
+      '第一章第1-3节 电工仪表与测量的基本方法': '电工测量方法排障实训',
+      '第一章第4-6节 误差的表示和消除': '智能工厂配电系统故障诊断',
+      '第四章第1-5节 频率与相位的测量': '大型变电站频率异常排查'
+    };
+    cases.push({
+      type: 'project',
+      title: projectTitleMap[activeCourse] || `${activeCourse} 项目案例`,
+      desc: '面向真实工程情境的交互式项目沙盘，可直接用于上课模式。'
+    });
+  }
+  if (generatedCaseState.circuit) {
+    const circuitTitleMap = {
+      '第一章第1-3节 电工仪表与测量的基本方法': '电工仪表基础电路模型',
+      '第一章第4-6节 误差的表示和消除': '电压表出厂校验闯关',
+      '第四章第1-5节 频率与相位的测量': '微分型频率表原理演示'
+    };
+    cases.push({
+      type: 'circuit',
+      title: circuitTitleMap[activeCourse] || `${activeCourse} 电路模型`,
+      desc: '以电路模型或仪表交互为载体，支持课堂演示和学生操作。'
+    });
+  }
+  return cases;
+};
+
 export const Navbar = ({ navigateTo }) => (
   <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -193,8 +224,9 @@ export const HomeView = ({ isAnimating, navigateTo }) => (
 );
 
 // --- 工作流组件: 案例生成 ---
-const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
-  const [step, setStep] = useState(1);
+const CaseGenerationView = ({ activeCourse, generatedCaseState, setCaseGenerationState }) => {
+  const generatedCases = getGeneratedCaseSummaries(activeCourse, generatedCaseState);
+  const [step, setStep] = useState(generatedCases.length > 0 ? 0 : 1);
   const [selectedKnowledge, setSelectedKnowledge] = useState([]);
   const [description, setDescription] = useState('');
   const [caseType, setCaseType] = useState('project'); 
@@ -270,6 +302,40 @@ const CaseGenerationView = ({ activeCourse, setCaseGenerationState }) => {
 
   return (
     <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 overflow-y-auto pb-12 pr-2 custom-scrollbar">
+      {step === 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-500">
+          <div className="p-8 border-b border-slate-100 bg-emerald-50/60 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-2xl font-bold text-emerald-900 flex items-center mb-2">
+                <CheckCircle2 className="w-6 h-6 mr-2 text-emerald-600" /> 已生成教学案例
+              </h3>
+              <p className="text-sm text-emerald-700/80">当前课程已有可用于上课模式的案例，可直接查看，也可修改配置后重新生成。</p>
+            </div>
+            <button onClick={() => setStep(1)} className="px-5 py-2.5 rounded-lg text-sm font-bold bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50 shadow-sm transition-colors flex items-center justify-center">
+              <RefreshCw className="w-4 h-4 mr-2" /> 修改 / 重新生成
+            </button>
+          </div>
+
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+            {generatedCases.map((generatedCase) => (
+              <div key={generatedCase.type} className="border border-slate-200 rounded-xl p-6 bg-white shadow-sm flex flex-col">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className={`p-3 rounded-lg ${generatedCase.type === 'project' ? 'bg-indigo-50 text-indigo-600' : 'bg-sky-50 text-sky-600'}`}>
+                    {generatedCase.type === 'project' ? <FileText className="w-6 h-6" /> : <Layers className="w-6 h-6" />}
+                  </div>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">已生成</span>
+                </div>
+                <h4 className="text-lg font-bold text-slate-900 mb-2">{generatedCase.title}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed mb-6 flex-1">{generatedCase.desc}</p>
+                <button onClick={() => { setCaseType(generatedCase.type); setStep(3); }} className="w-full py-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors flex items-center justify-center">
+                  <MonitorPlay className="w-4 h-4 mr-2" /> 查看已生成案例
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {step === 1 && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-500">
           <div className="p-6 border-b border-slate-100 bg-slate-50">
@@ -1940,6 +2006,7 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
                         let isModuleCompleted = false;
                         if (title === '备课') {
                            if (opt.label === '思政导入') isModuleCompleted = ideologicalState[selectedCourseTemp]?.isCompletedOnce;
+                           if (opt.label === '案例生成') isModuleCompleted = hasGeneratedCase(caseGenerationState[selectedCourseTemp]);
                         } else if (title === '课后') {
                            if (opt.label === '布置作业') isModuleCompleted = homeworkState && homeworkState[selectedCourseTemp];
                            else isModuleCompleted = completedModules.includes(opt.label);
@@ -2048,7 +2115,7 @@ export const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateT
               </div>
             ) : actionName === '案例生成' ? (
               <div className="w-full flex-1 min-h-0 flex flex-col">
-                <CaseGenerationView activeCourse={activeCourse} setCaseGenerationState={(updater) => updateCaseGenerationState(activeCourse, updater)} />
+                <CaseGenerationView activeCourse={activeCourse} generatedCaseState={caseGenerationState[activeCourse]} setCaseGenerationState={(updater) => updateCaseGenerationState(activeCourse, updater)} />
               </div>
             ) : (
               <div className="w-full flex-1 min-h-0 flex flex-col"><AIGeneratorView actionName={actionName} courseName={activeCourse} /></div>
