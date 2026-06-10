@@ -370,6 +370,13 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
         .btn-start:hover:not(:disabled) { background: #67e8f9; transform: translateY(-1px); }
         .quiz-panel { width: 0; display: none; flex-direction: column; background: #19192d; border: 1px solid var(--line); border-radius: 12px; overflow: auto; padding: 22px; transition: width .45s ease; }
         .quiz-panel.open { display: flex; width: min(42%, 560px); }
+        .main-content.ai-active { flex-direction: column; }
+        .main-content.ai-active .document-viewer { flex: none; }
+        .main-content.ai-active .paper { flex: none; min-height: 520px; max-height: 640px; }
+        .main-content.ai-active .footer-controls { margin-bottom: 0; }
+        .main-content.ai-active .quiz-panel.open { width: 100%; min-height: 360px; }
+        .main-content.ai-active .options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+        .main-content.ai-active .option { min-height: 116px; }
         .quiz-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
         .quiz-header h2 { margin: 0; color: var(--accent-blue); font-size: 22px; }
         .stage-label { color: #cbd5e1; background: #2b2b45; border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; }
@@ -393,6 +400,7 @@ ${aiGuidanceModalStyles}
             .terminal-header { align-items: flex-start; flex-direction: column; }
             .main-content { flex-direction: column; }
             .quiz-panel.open { width: 100%; }
+            .main-content.ai-active .options { grid-template-columns: 1fr; }
             .meta-row, .data-grid, .split, .matrix, .risk-grid { grid-template-columns: 1fr; }
             .footer-controls { flex-direction: column; align-items: stretch; }
             .btn-start { width: 100%; }
@@ -406,7 +414,7 @@ ${aiGuidanceModalStyles}
         <div class="status"><span class="status-dot"></span>MEASUREMENT CHAIN INCONSISTENT - AI REVIEW REQUIRED</div>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <div class="document-viewer" id="documentViewer">
             <section class="paper active" id="page1">
                 <h2>柔性装配线 24V 传感器回路状态总览 (P1/4)</h2>
@@ -640,12 +648,13 @@ ${aiGuidanceModalScript}
         }
 
         function startTroubleshooting() {
+            document.getElementById('mainContent').classList.add('ai-active');
             document.getElementById('quizPanel').classList.add('open');
-            document.getElementById('documentViewer').style.flex = '.72';
             document.getElementById('callAiBtn').disabled = true;
             document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
             currentStage = 0;
             render();
+            document.getElementById('quizPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function render() {
