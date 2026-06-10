@@ -304,132 +304,275 @@ export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>电工测量方法排障实训 - AI 助教递进式诊断</title>
+    <title>电工测量方法排障实训 - 现场资料包</title>
     <style>
         :root {
-            --bg: #f8fafc; --panel: #ffffff; --ink: #1e293b; --muted: #64748b;
-            --line: #dbe4ef; --blue: #2563eb; --teal: #0f766e; --amber: #d97706;
-            --green: #16a34a; --red: #dc2626;
+            --bg-dark: #141426; --panel-bg: #2b2b45; --panel-deep: #1d1d31;
+            --text-main: #e5e7eb; --text-muted: #aab2c5; --paper: #ffffff;
+            --ink: #2b2f38; --accent-blue: #18d5ff; --accent-red: #ff5252;
+            --accent-green: #2ed573; --accent-amber: #f59e0b; --line: #4b4b72;
         }
         * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "PingFang SC", sans-serif; }
-        .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
-        .hero { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-left: 5px solid var(--teal); border-radius: 16px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
-        .hero h1 { margin: 0 0 10px; font-size: 26px; color: #0f172a; }
-        .hero p { margin: 0; color: var(--muted); line-height: 1.7; }
-        .layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 22px; margin-top: 22px; align-items: stretch; }
-        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); overflow: hidden; }
-        .card-header { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .card-header h2 { font-size: 18px; margin: 0; }
-        .tag { font-size: 12px; color: var(--blue); background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 8px; border-radius: 999px; font-weight: 700; white-space: nowrap; }
-        .scene { padding: 20px; display: grid; gap: 16px; }
-        .diagram { border: 1px solid #cbd5e1; border-radius: 14px; background: linear-gradient(180deg, #f8fafc, #eef6ff); padding: 20px; min-height: 260px; position: relative; }
-        .bus { height: 10px; background: #334155; border-radius: 99px; margin: 34px 28px 22px; position: relative; }
-        .node { position: absolute; top: -18px; width: 46px; height: 46px; border-radius: 999px; background: white; border: 3px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; box-shadow: 0 8px 18px rgba(2, 132, 199, .18); }
-        .n1 { left: 8%; } .n2 { left: 44%; border-color: #f59e0b; } .n3 { right: 8%; border-color: #22c55e; }
-        .meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 48px; }
-        .meter-box { border: 1px solid #dbe4ef; background: white; border-radius: 12px; padding: 14px; }
-        .meter-box strong { display: block; font-size: 13px; margin-bottom: 8px; color: #475569; }
-        .reading { font-size: 22px; font-weight: 900; color: #0f172a; }
-        .bad { color: var(--red); } .warn { color: var(--amber); } .ok { color: var(--green); }
-        .log { background: #0f172a; color: #dbeafe; border-radius: 12px; padding: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.75; }
-        .log b { color: #fde68a; }
-        .knowledge { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 20px; }
-        .knowledge span { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-        .coach { display: flex; flex-direction: column; min-height: 100%; }
-        .coach-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
-        .progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .dot { height: 8px; border-radius: 999px; background: #e2e8f0; }
-        .dot.active { background: var(--blue); }
-        .call-ai { width: 100%; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .call-ai:hover { background: #1e293b; }
-        .ai-box { border-left: 4px solid var(--blue); background: #eff6ff; border-radius: 0 12px 12px 0; padding: 16px; line-height: 1.7; color: #1e3a8a; }
-        .stage-title { margin: 0; font-size: 20px; color: #0f172a; }
-        .options { display: grid; gap: 10px; }
-        .option { width: 100%; text-align: left; border: 2px solid #e2e8f0; background: white; border-radius: 12px; padding: 14px 15px; cursor: pointer; color: #334155; font-size: 15px; line-height: 1.55; transition: .18s; }
-        .option:hover { border-color: #93c5fd; background: #f8fbff; }
-        .option.correct { border-color: var(--green); background: #ecfdf5; color: #166534; font-weight: 800; }
-        .option.wrong { border-color: var(--red); background: #fef2f2; color: #991b1b; }
-        .option:disabled { cursor: not-allowed; opacity: .75; }
-        .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: auto; }
-        .btn { border: 0; border-radius: 11px; padding: 12px 16px; cursor: pointer; font-weight: 800; transition: .18s; }
-        .btn-primary { background: var(--blue); color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #f1f5f9; color: #475569; }
-        .btn-secondary:hover { background: #e2e8f0; }
+        body { margin: 0; min-height: 100vh; background: #f8fafc; color: var(--text-main); font-family: "Segoe UI", "PingFang SC", sans-serif; }
+        .container { width: min(96vw, 1460px); min-height: 780px; margin: 24px auto 36px; background: var(--bg-dark); border-radius: 22px; box-shadow: 0 20px 60px rgba(15, 23, 42, .35); overflow: hidden; border: 1px solid var(--line); display: flex; flex-direction: column; }
+        .terminal-header { background: #151525; border-bottom: 2px solid var(--line); padding: 20px 26px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+        .terminal-header h1 { margin: 0; font-size: 25px; letter-spacing: 1px; color: var(--accent-blue); }
+        .status { color: var(--accent-red); font-size: 19px; font-weight: 900; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+        .status-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent-red); box-shadow: 0 0 16px rgba(255, 82, 82, .55); animation: pulse 1s infinite; }
+        .main-content { flex: 1; background: var(--panel-bg); padding: 24px; display: flex; gap: 22px; min-height: 620px; }
+        .document-viewer { flex: 1; display: flex; flex-direction: column; min-width: 0; transition: flex .45s ease; }
+        .paper { flex: 1; background: var(--paper); color: var(--ink); border-radius: 8px; padding: 36px 40px; box-shadow: inset 0 0 0 1px #e5e7eb, 0 10px 26px rgba(0,0,0,.18); overflow: auto; display: none; }
+        .paper.active { display: block; }
+        .paper h2 { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 3px solid #2f3542; font-size: 27px; color: #2b2f38; }
+        .paper h3 { margin: 22px 0 12px; font-size: 18px; color: #2b2f38; }
+        .paper p { color: #4b5563; line-height: 1.7; margin: 10px 0; }
+        .meta-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0 20px; }
+        .meta-card { border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; background: #f8fafc; }
+        .meta-card span { display: block; color: #64748b; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .meta-card strong { color: #111827; font-size: 20px; }
+        .bad { color: #ef4444 !important; } .warn { color: #d97706 !important; } .ok { color: #16a34a !important; } .blue { color: #0284c7 !important; }
+        .bar-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; margin: 10px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 800; }
+        .bar-bg { background: #e5e7eb; height: 28px; border-radius: 4px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,.12); }
+        .bar { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-size: 13px; }
+        .bar.gray { background: #95a5a6; } .bar.green { background: #2ecc71; } .bar.orange { background: #e67e22; } .bar.red { background: #e74c3c; }
+        .data-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; }
+        .panel-light { border: 1px solid #d1d5db; border-radius: 10px; padding: 16px; background: #f8fafc; }
+        .topology { position: relative; min-height: 210px; border: 1px solid #cbd5e1; border-radius: 10px; background: linear-gradient(180deg, #f8fafc, #eef6ff); padding: 18px; }
+        .bus { height: 8px; border-radius: 999px; background: #334155; margin: 70px 60px 30px; position: relative; }
+        .node { position: absolute; top: -22px; width: 58px; height: 50px; border-radius: 50%; background: #fff; border: 3px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #111827; box-shadow: 0 10px 20px rgba(15, 23, 42, .16); }
+        .node.n1 { left: 3%; } .node.n2 { left: 42%; border-color: #f59e0b; } .node.n3 { right: 3%; border-color: #22c55e; }
+        .trace { position: absolute; top: 126px; color: #64748b; font-size: 12px; font-weight: 800; }
+        .trace.t1 { left: 8%; } .trace.t2 { left: 44%; } .trace.t3 { right: 8%; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #111827; color: #e5e7eb; text-align: left; padding: 10px; }
+        td { border: 1px solid #e5e7eb; padding: 9px 10px; color: #374151; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .log-list { background: #101827; color: #dbeafe; border-radius: 10px; padding: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.8; min-height: 430px; }
+        .log-list b { color: #fde68a; }
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .matrix { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .matrix-card { border: 1px solid #d1d5db; background: #fff; border-radius: 8px; padding: 12px; min-height: 120px; }
+        .matrix-card strong { display: block; color: #111827; margin-bottom: 8px; }
+        .matrix-card span { display: block; color: #64748b; font-size: 12px; line-height: 1.5; }
+        .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+        .risk { border-radius: 9px; padding: 14px; color: white; min-height: 118px; }
+        .risk.low { background: #16a34a; } .risk.mid { background: #d97706; } .risk.high { background: #dc2626; }
+        .risk span { display: block; font-size: 12px; opacity: .86; margin-bottom: 8px; }
+        .risk strong { font-size: 20px; }
+        .footer-controls { margin-top: 18px; background: var(--panel-deep); border-radius: 9px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+        .page-controls { display: flex; align-items: center; gap: 18px; }
+        .btn { border: 0; border-radius: 6px; padding: 13px 24px; cursor: pointer; font-weight: 900; font-size: 16px; transition: .2s; }
+        .btn-nav { background: #4a4a72; color: #e5e7eb; }
+        .btn-nav:hover:not(:disabled) { background: #62628f; }
         .btn:disabled { opacity: .45; cursor: not-allowed; }
-        .feedback { min-height: 48px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; color: var(--muted); border: 1px dashed #cbd5e1; line-height: 1.6; }
-        .complete { background: #ecfdf5; border-color: #bbf7d0; color: #166534; font-weight: 800; }
+        .page-label { color: #f8fafc; font-weight: 800; letter-spacing: .5px; }
+        .btn-start { background: var(--accent-blue); color: #06111f; padding: 16px 38px; box-shadow: 0 0 20px rgba(24,213,255,.25); }
+        .btn-start:hover:not(:disabled) { background: #67e8f9; transform: translateY(-1px); }
+        .quiz-panel { width: 0; display: none; flex-direction: column; background: #19192d; border: 1px solid var(--line); border-radius: 12px; overflow: auto; padding: 22px; transition: width .45s ease; }
+        .quiz-panel.open { display: flex; width: min(42%, 560px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+        .quiz-header h2 { margin: 0; color: var(--accent-blue); font-size: 22px; }
+        .stage-label { color: #cbd5e1; background: #2b2b45; border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+        .ai-dialogue { background: rgba(24,213,255,.1); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 0 8px 8px 0; line-height: 1.7; color: #dbeafe; margin-bottom: 18px; }
+        .stage-title { color: var(--accent-blue); font-size: 22px; margin: 0 0 14px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #2b2b45; color: #f8fafc; border: 2px solid var(--line); border-radius: 8px; padding: 16px; text-align: left; cursor: pointer; line-height: 1.55; font-size: 15px; }
+        .option:hover { border-color: var(--accent-blue); background: #333352; }
+        .option.correct { border-color: var(--accent-green); color: #bbf7d0; background: rgba(34,197,94,.12); }
+        .option.wrong { border-color: var(--accent-red); color: #fecaca; background: rgba(239,68,68,.12); }
+        .option:disabled { cursor: not-allowed; opacity: .75; }
+        .feedback { margin-top: 16px; min-height: 58px; padding: 13px 14px; border-radius: 8px; border: 1px dashed var(--line); color: #cbd5e1; line-height: 1.6; }
+        .feedback.complete { background: rgba(34,197,94,.12); border-color: var(--accent-green); color: #bbf7d0; font-weight: 800; }
+        .quiz-actions { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; gap: 12px; }
+        .btn-secondary { background: #33334f; color: #dbeafe; }
+        .btn-primary { background: var(--accent-blue); color: #06111f; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 ${aiGuidanceModalStyles}
-        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .meter { grid-template-columns: 1fr; } }
+        @media (max-width: 980px) {
+            .container { width: 100vw; margin: 0; border-radius: 0; min-height: 100vh; }
+            .terminal-header { align-items: flex-start; flex-direction: column; }
+            .main-content { flex-direction: column; }
+            .quiz-panel.open { width: 100%; }
+            .meta-row, .data-grid, .split, .matrix, .risk-grid { grid-template-columns: 1fr; }
+            .footer-controls { flex-direction: column; align-items: stretch; }
+            .btn-start { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="shell">
-        <section class="hero">
-            <h1>智能产线测量异常排障：仪表基础与测量方法选择</h1>
-            <p>背景：某柔性装配线的 24V 传感器供电回路频繁误报欠压，学生需要调用 AI 助教，从测量对象、仪表类型、测量方法与测量系统组成四个层面逐步定位问题。</p>
-        </section>
-
-        <main class="layout">
-            <section class="card">
-                <div class="card-header">
-                    <h2>现场图文场景</h2>
-                    <span class="tag">知识点：测量方法 / 仪表分类 / 测量系统</span>
-                </div>
-                <div class="scene">
-                    <div class="diagram">
-                        <div class="bus">
-                            <div class="node n1">PLC</div>
-                            <div class="node n2">S2</div>
-                            <div class="node n3">LOAD</div>
-                        </div>
-                        <div class="meter">
-                            <div class="meter-box"><strong>万用表直接测量</strong><div class="reading bad">18.6 V</div></div>
-                            <div class="meter-box"><strong>标准源比较测量</strong><div class="reading ok">24.1 V</div></div>
-                            <div class="meter-box"><strong>回路工作电流</strong><div class="reading warn">0.42 A</div></div>
-                        </div>
-                    </div>
-                    <div class="log">
-                        [09:20:11] WARN  S2 sensor undervoltage alarm<br>
-                        [09:20:14] INFO  PLC input status normal<br>
-                        [09:20:21] <b>NOTE</b> handheld meter probe connected across load while line is energized<br>
-                        [09:20:30] CHECK standard source output: 24.1V stable<br>
-                        [09:21:02] TODO  verify method, meter category, and measurement chain
-                    </div>
-                </div>
-                <div class="knowledge">
-                    <span>电工测量的基本概念</span>
-                    <span>电工仪表的分类</span>
-                    <span>直接测量 / 比较测量</span>
-                    <span>测量系统分析</span>
-                </div>
-            </section>
-
-            <section class="card coach">
-                <div class="card-header">
-                    <h2>AI 助教递进式排障</h2>
-                    <span class="tag" id="stageLabel">第 1 / 4 问</span>
-                </div>
-                <div class="coach-body">
-                    <div class="progress" id="progress"></div>
-                    <button class="btn call-ai" id="callAiBtn">一键呼叫 AI 助教</button>
-                    <h3 class="stage-title" id="stageTitle"></h3>
-                    <div class="ai-box" id="aiPrompt"></div>
-                    <div class="options" id="options"></div>
-                    <div class="feedback" id="feedback">点击选项后，AI 助教会给出下一步排障提示。</div>
-                    <div class="actions">
-                        <button class="btn btn-secondary" id="resetBtn">重新排障</button>
-                        <button class="btn btn-primary" id="nextBtn" disabled>下一问</button>
-                    </div>
-                </div>
-            </section>
-        </main>
+<div class="container">
+    <div class="terminal-header">
+        <h1>[MEASURE_Lab] 智能产线传感器供电测量终端</h1>
+        <div class="status"><span class="status-dot"></span>MEASUREMENT CHAIN INCONSISTENT - AI REVIEW REQUIRED</div>
     </div>
+
+    <div class="main-content">
+        <div class="document-viewer" id="documentViewer">
+            <section class="paper active" id="page1">
+                <h2>柔性装配线 24V 传感器回路状态总览 (P1/4)</h2>
+                <p><strong>[现场资料包]</strong> S2 工位连续 3 次触发欠压误报，PLC 输入未丢失，标准源输出稳定。学生需要从测量对象、仪表类型、测量方法与测量系统组成定位矛盾来源。</p>
+                <div class="meta-row">
+                    <div class="meta-card"><span>告警次数</span><strong class="bad">3 次</strong></div>
+                    <div class="meta-card"><span>PLC 输入状态</span><strong class="ok">NORMAL</strong></div>
+                    <div class="meta-card"><span>标准源输出</span><strong class="ok">24.1 V</strong></div>
+                    <div class="meta-card"><span>手持表最低读数</span><strong class="bad">18.6 V</strong></div>
+                </div>
+                <h3>过去 6 次巡检读数趋势</h3>
+                <div class="bar-row"><span>08:40</span><div class="bar-bg"><div class="bar green" style="width: 96%;">24.0 V 正常</div></div></div>
+                <div class="bar-row"><span>08:55</span><div class="bar-bg"><div class="bar gray" style="width: 95%;">23.8 V</div></div></div>
+                <div class="bar-row"><span>09:10</span><div class="bar-bg"><div class="bar orange" style="width: 83%;">20.7 V 疑似压降</div></div></div>
+                <div class="bar-row"><span>09:20</span><div class="bar-bg"><div class="bar red" style="width: 74%;">18.6 V 欠压报警</div></div></div>
+                <div class="bar-row"><span>09:24</span><div class="bar-bg"><div class="bar green" style="width: 96%;">24.1 V 标准源复核</div></div></div>
+                <div class="bar-row"><span>09:31</span><div class="bar-bg"><div class="bar orange" style="width: 84%;">21.0 V 接表后下降</div></div></div>
+                <div class="data-grid">
+                    <div class="panel-light">
+                        <h3>现场拓扑</h3>
+                        <div class="topology">
+                            <div class="bus">
+                                <div class="node n1">PLC</div>
+                                <div class="node n2">S2</div>
+                                <div class="node n3">LOAD</div>
+                            </div>
+                            <div class="trace t1">电源端 24V</div>
+                            <div class="trace t2">传感器测点</div>
+                            <div class="trace t3">执行负载端</div>
+                        </div>
+                    </div>
+                    <div class="panel-light">
+                        <h3>初始判断约束</h3>
+                        <table>
+                            <tr><th>线索</th><th>约束含义</th></tr>
+                            <tr><td>PLC 输入正常</td><td>不能直接判定传感器断线</td></tr>
+                            <tr><td>标准源 24.1V 稳定</td><td>需要校验手持表与测量方法</td></tr>
+                            <tr><td>接表后下降</td><td>仪表接入可能改变被测对象状态</td></tr>
+                            <tr><td>同一回路多测点差异</td><td>必须先界定测量对象</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="paper" id="page2">
+                <h2>SCADA 与手持仪表原始记录 (P2/4)</h2>
+                <p>本页提供不同系统来源的时间戳数据，重点观察“告警、PLC 状态、测量方式变化、标准源校验”之间是否相互支持。</p>
+                <div class="split">
+                    <div>
+                        <h3>事件日志摘录</h3>
+                        <div class="log-list">
+                            [09:19:47] INFO  PLC_DI_S2 = 1, cycle normal<br>
+                            [09:20:11] WARN  S2 sensor undervoltage alarm: 18.6V<br>
+                            [09:20:14] INFO  PLC input status normal, no packet loss<br>
+                            [09:20:21] <b>NOTE</b> handheld meter probe connected across load while line is energized<br>
+                            [09:20:30] CHECK standard source output: 24.1V stable<br>
+                            [09:21:02] TODO  verify measurement object and method category<br>
+                            [09:21:25] WARN  probe contact pressure changed, value recovers to 22.8V<br>
+                            [09:22:06] INFO  current clamp indicates 0.42A, load not overcurrent<br>
+                            [09:22:34] NOTE  second meter with high input impedance reads 23.9V
+                        </div>
+                    </div>
+                    <div>
+                        <h3>关键读数对照</h3>
+                        <table>
+                            <tr><th>数据源</th><th>测点</th><th>读数</th><th>备注</th></tr>
+                            <tr><td>手持表 A</td><td>负载端</td><td class="bad">18.6 V</td><td>直接测量，接触不稳定</td></tr>
+                            <tr><td>标准源</td><td>校验端</td><td class="ok">24.1 V</td><td>比较测量基准</td></tr>
+                            <tr><td>钳形表</td><td>回路电流</td><td class="warn">0.42 A</td><td>负载未过流</td></tr>
+                            <tr><td>手持表 B</td><td>同测点</td><td class="ok">23.9 V</td><td>高输入阻抗</td></tr>
+                            <tr><td>PLC 诊断</td><td>DI/S2</td><td class="ok">NORMAL</td><td>控制输入未中断</td></tr>
+                        </table>
+                        <h3>数据冲突提示</h3>
+                        <div class="panel-light">
+                            单一读数 18.6V 与标准源、PLC 输入、高阻表读数不一致。若学生只依据最低读数判断故障，会把“测量过程异常”误判成“设备供电异常”。
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="paper" id="page3">
+                <h2>测点与接线方式复盘表 (P3/4)</h2>
+                <p>本页用于确认“测量对象是什么”和“仪表怎样接入”。同样是电压读数，不同测点、不同接线方式、不同输入阻抗都会改变工程含义。</p>
+                <div class="matrix">
+                    <div class="matrix-card"><strong>A1 电源端电压</strong><span>对象：电源模块输出</span><span>方法：直接测量</span><span>期望：23.5V-24.5V</span></div>
+                    <div class="matrix-card"><strong>B2 负载端电压</strong><span>对象：S2 与 LOAD 端子</span><span>风险：探针接触压降</span><span>最低：18.6V</span></div>
+                    <div class="matrix-card"><strong>C3 回路电流</strong><span>对象：串联回路电流</span><span>方法：钳形表辅助</span><span>读数：0.42A</span></div>
+                    <div class="matrix-card"><strong>D4 标准源校验</strong><span>对象：仪表读数可信度</span><span>方法：比较测量</span><span>基准：24.1V</span></div>
+                </div>
+                <h3>接线规则核验</h3>
+                <table>
+                    <tr><th>任务</th><th>正确接入</th><th>本次风险</th><th>课程知识点</th></tr>
+                    <tr><td>测电压</td><td>仪表并联在两测点之间</td><td>测点选择混乱，负载端与电源端混用</td><td>被测量与测量对象</td></tr>
+                    <tr><td>测电流</td><td>仪表串联或使用钳形表感应</td><td>学生曾尝试跨接电流档</td><td>电工仪表分类与安全接入</td></tr>
+                    <tr><td>校验仪表</td><td>与标准源或高准确度仪表比较</td><td>没有先做基准校验就判断故障</td><td>直接测量与比较测量</td></tr>
+                    <tr><td>测量链分析</td><td>对象、仪表、方法、环境共同分析</td><td>只截取最低读数</td><td>测量系统组成</td></tr>
+                </table>
+                <div class="risk-grid">
+                    <div class="risk high"><span>高风险</span><strong>测点定义不清</strong><p>同一份报告混用电源端、负载端、端子压降。</p></div>
+                    <div class="risk mid"><span>中风险</span><strong>仪表接入影响</strong><p>手持表 A 接入后读数异常下降。</p></div>
+                    <div class="risk low"><span>低风险</span><strong>真实负载过流</strong><p>0.42A 未超过负载额定区间。</p></div>
+                </div>
+            </section>
+
+            <section class="paper" id="page4">
+                <h2>测量链路综合研判单 (P4/4)</h2>
+                <p>本页把多个信息源合并为可行动的诊断链，要求学生在呼叫 AI 助教前先完成数据过滤：哪些数据反映真实对象，哪些数据反映测量过程。</p>
+                <div class="data-grid">
+                    <div class="panel-light">
+                        <h3>仪表可信度评分</h3>
+                        <table>
+                            <tr><th>仪表/来源</th><th>准确性</th><th>接入影响</th><th>结论</th></tr>
+                            <tr><td>手持表 A</td><td class="warn">中</td><td class="bad">高</td><td>需复核，不宜单独作为结论</td></tr>
+                            <tr><td>手持表 B</td><td class="ok">高</td><td class="ok">低</td><td>可用于负载端复测</td></tr>
+                            <tr><td>标准源</td><td class="ok">高</td><td class="ok">低</td><td>用于比较测量基准</td></tr>
+                            <tr><td>PLC 诊断</td><td class="blue">辅助</td><td class="ok">无</td><td>证明控制输入未丢失</td></tr>
+                        </table>
+                    </div>
+                    <div class="panel-light">
+                        <h3>待提交给 AI 助教的问题边界</h3>
+                        <table>
+                            <tr><th>层级</th><th>应追问的问题</th></tr>
+                            <tr><td>测量对象</td><td>18.6V 到底来自哪个测点？</td></tr>
+                            <tr><td>测量方法</td><td>直接测量是否需要比较测量复核？</td></tr>
+                            <tr><td>仪表类型</td><td>输入阻抗与准确度等级是否适配？</td></tr>
+                            <tr><td>测量系统</td><td>传感器、导线、仪表、接触状态如何共同影响结果？</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <h3>现场初步结论</h3>
+                <div class="panel-light">
+                    目前证据不支持“传感器供电系统真实失效”的单点结论。更合理的路径是先明确被测对象和测点，再用标准源或高输入阻抗仪表进行比较测量，最后把仪表接入影响纳入测量系统分析。
+                </div>
+            </section>
+
+            <div class="footer-controls">
+                <div class="page-controls">
+                    <button class="btn btn-nav" id="btnPrev" onclick="changePage(-1)" disabled>上一页</button>
+                    <span class="page-label">Page <span id="pageNum">1</span> / 4</span>
+                    <button class="btn btn-nav" id="btnNext" onclick="changePage(1)">下一页</button>
+                </div>
+                <button class="btn btn-start" id="callAiBtn" onclick="startTroubleshooting()">呼叫 AI 助教协助排障</button>
+            </div>
+        </div>
+
+        <aside class="quiz-panel" id="quizPanel">
+            <div class="quiz-header">
+                <h2>AI 助教递进式排障</h2>
+                <span class="stage-label" id="stageLabel">第 1 / 4 问</span>
+            </div>
+            <h3 class="stage-title" id="stageTitle"></h3>
+            <div class="ai-dialogue" id="aiPrompt"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback">点击选项后，AI 助教会给出下一步排障提示。</div>
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="resetBtn">重新排障</button>
+                <button class="btn btn-primary" id="nextBtn" disabled>下一问</button>
+            </div>
+        </aside>
+    </div>
+</div>
 ${aiGuidanceModalHTML}
 
     <script>
         const moduleName = '电工测量方法排障实训';
+        const totalPages = 4;
         const stages = [
             {
                 title: '第一问：先确认测量对象',
@@ -483,27 +626,31 @@ ${aiGuidanceModalHTML}
 
         let currentStage = 0;
         let answered = false;
-        let assistantCalled = false;
+        let currentPage = 1;
 
 ${aiGuidanceModalScript}
+
+        function changePage(delta) {
+            document.getElementById('page' + currentPage).classList.remove('active');
+            currentPage += delta;
+            document.getElementById('page' + currentPage).classList.add('active');
+            document.getElementById('pageNum').innerText = currentPage;
+            document.getElementById('btnPrev').disabled = currentPage === 1;
+            document.getElementById('btnNext').disabled = currentPage === totalPages;
+        }
+
+        function startTroubleshooting() {
+            document.getElementById('quizPanel').classList.add('open');
+            document.getElementById('documentViewer').style.flex = '.72';
+            document.getElementById('callAiBtn').disabled = true;
+            document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
+            currentStage = 0;
+            render();
+        }
 
         function render() {
             const stage = stages[currentStage];
             answered = false;
-            document.getElementById('progress').innerHTML = stages.map((_, index) => '<div class="dot ' + (assistantCalled && index <= currentStage ? 'active' : '') + '"></div>').join('');
-            if (!assistantCalled) {
-                document.getElementById('stageLabel').innerText = '待开始';
-                document.getElementById('stageTitle').innerText = '现场异常已加载';
-                document.getElementById('aiPrompt').innerText = '点击“一键呼叫 AI 助教”，系统会把这个项目案例拆成 4 个递进排障问题，引导学生从测量对象一路分析到测量系统。';
-                document.getElementById('options').innerHTML = '';
-                document.getElementById('feedback').className = 'feedback';
-                document.getElementById('feedback').innerText = '等待学生呼叫 AI 助教。';
-                document.getElementById('nextBtn').disabled = true;
-                document.getElementById('nextBtn').innerText = '下一问';
-                document.getElementById('callAiBtn').disabled = false;
-                document.getElementById('callAiBtn').innerText = '一键呼叫 AI 助教';
-                return;
-            }
             document.getElementById('stageLabel').innerText = '第 ' + (currentStage + 1) + ' / ' + stages.length + ' 问';
             document.getElementById('stageTitle').innerText = stage.title;
             document.getElementById('aiPrompt').innerText = stage.prompt;
@@ -511,8 +658,6 @@ ${aiGuidanceModalScript}
             document.getElementById('feedback').innerText = '点击选项后，AI 助教会给出下一步排障提示。';
             document.getElementById('nextBtn').disabled = true;
             document.getElementById('nextBtn').innerText = currentStage === stages.length - 1 ? '完成实训' : '下一问';
-            document.getElementById('callAiBtn').disabled = true;
-            document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
             document.getElementById('options').innerHTML = stage.options.map((option, index) =>
                 '<button class="option" data-index="' + index + '">' + option + '</button>'
             ).join('');
@@ -557,16 +702,8 @@ ${aiGuidanceModalScript}
 
         document.getElementById('resetBtn').addEventListener('click', () => {
             currentStage = 0;
-            assistantCalled = false;
             render();
         });
-
-        document.getElementById('callAiBtn').addEventListener('click', () => {
-            assistantCalled = true;
-            render();
-        });
-
-        render();
     </script>
 </body>
 </html>`;
