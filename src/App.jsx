@@ -16,10 +16,10 @@ export default function App() {
   const [caseGenerationState, setCaseGenerationState] = useState({
     "第一章第1-3节 电工仪表与测量的基本方法": { project: true, circuit: false },
     "第一章第4-6节 误差的表示和消除": { project: true, circuit: true },
-    "第二章第1-2节 电压与电流的测量&磁电系仪表": { project: false, circuit: false },
-    "第二章第3-4节 磁电系检流计&电磁系仪表": { project: false, circuit: false },
-    "第二章第5-7节 电动系仪表&万用电表": { project: false, circuit: false },
-    "第二章第8-10节 直流电位差计&电子系电压表": { project: false, circuit: false },
+    "第二章第1-2节 电压与电流的测量&磁电系仪表": { project: true, circuit: false },
+    "第二章第3-4节 磁电系检流计&电磁系仪表": { project: true, circuit: false },
+    "第二章第5-7节 电动系仪表&万用电表": { project: true, circuit: false },
+    "第二章第8-10节 直流电位差计&电子系电压表": { project: true, circuit: false },
     "第四章第1-5节 频率与相位的测量": { project: false, circuit: false }
   });
 

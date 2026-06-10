@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { BookOpen, MonitorPlay, ClipboardCheck, ArrowRight, BrainCircuit, User, Bell, Search, BarChart3, ChevronRight, X, FileText, CheckCircle, Wrench, FileQuestion, Sparkles, Loader2, Lock, AlertCircle, TrendingUp, Users, Target, CheckCircle2, Clock, FileSpreadsheet, ChevronDown, ChevronUp, UploadCloud, RefreshCw, CheckSquare, Presentation, Lightbulb, ArrowDownToLine, Layers, Settings2, Send, MessageSquare, Activity } from 'lucide-react';
 import { courseList, knowledgeModules, knowledgePointMockData, radarDimensions, studentRadarData, teachingGuides } from '../data/courseData';
 import { generateWithGemini } from '../services/gemini';
-import { basicMeasurementTroubleshootingHTML, frequencyMeterHTMLTemplate, getPlaceholderHTML, ghostTrippingHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
+import { basicMeasurementTroubleshootingHTML, dynamometerMultimeterCaseHTML, frequencyMeterHTMLTemplate, galvanometerElectromagneticCaseHTML, getPlaceholderHTML, ghostTrippingHTML, potentiometerElectronicVoltmeterCaseHTML, voltageCurrentMagnetoelectricCaseHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
 
 // --- 动态获取弹窗选项 ---
 const getModalOptions = (title, course) => {
@@ -18,6 +18,26 @@ const getModalOptions = (title, course) => {
       return [
         { label: '智能工厂配电系统故障诊断', path: '上课-智能工厂配电系统故障诊断', icon: Wrench }, 
         { label: '电压表出厂校验闯关', path: '上课-电压表出厂校验闯关', icon: CheckCircle }
+      ];
+    }
+    if (course === '第二章第1-2节 电压与电流的测量&磁电系仪表') {
+      return [
+        { label: '电压电流与磁电系仪表接入排障', path: '上课-电压电流与磁电系仪表接入排障', icon: Wrench }
+      ];
+    }
+    if (course === '第二章第3-4节 磁电系检流计&电磁系仪表') {
+      return [
+        { label: '检流计零位漂移与电磁系仪表排障', path: '上课-检流计零位漂移与电磁系仪表排障', icon: Wrench }
+      ];
+    }
+    if (course === '第二章第5-7节 电动系仪表&万用电表') {
+      return [
+        { label: '电动系功率表与万用表量程排障', path: '上课-电动系功率表与万用表量程排障', icon: Wrench }
+      ];
+    }
+    if (course === '第二章第8-10节 直流电位差计&电子系电压表') {
+      return [
+        { label: '直流电位差计与电子电压表高阻排障', path: '上课-直流电位差计与电子电压表高阻排障', icon: Wrench }
       ];
     }
     if (course === '第四章第1-5节 频率与相位的测量') {
@@ -38,6 +58,10 @@ const getGeneratedCaseSummaries = (activeCourse, generatedCaseState = {}) => {
     const projectTitleMap = {
       '第一章第1-3节 电工仪表与测量的基本方法': '电工测量方法排障实训',
       '第一章第4-6节 误差的表示和消除': '智能工厂配电系统故障诊断',
+      '第二章第1-2节 电压与电流的测量&磁电系仪表': '电压电流与磁电系仪表接入排障',
+      '第二章第3-4节 磁电系检流计&电磁系仪表': '检流计零位漂移与电磁系仪表排障',
+      '第二章第5-7节 电动系仪表&万用电表': '电动系功率表与万用表量程排障',
+      '第二章第8-10节 直流电位差计&电子系电压表': '直流电位差计与电子电压表高阻排障',
       '第四章第1-5节 频率与相位的测量': '大型变电站频率异常排查'
     };
     cases.push({
@@ -289,13 +313,21 @@ const CaseGenerationView = ({ activeCourse, generatedCaseState, setCaseGeneratio
             ? basicMeasurementTroubleshootingHTML
             : getPlaceholderHTML('电工仪表基础电路模型');
       } else if (activeCourse === '第二章第1-2节 电压与电流的测量&磁电系仪表') {
-          return getPlaceholderHTML('磁电系电压表电流表校准');
+          return caseType === 'project'
+            ? voltageCurrentMagnetoelectricCaseHTML
+            : getPlaceholderHTML('磁电系电压表电流表校准');
       } else if (activeCourse === '第二章第3-4节 磁电系检流计&电磁系仪表') {
-          return getPlaceholderHTML('检流计与电磁系仪表实训');
+          return caseType === 'project'
+            ? galvanometerElectromagneticCaseHTML
+            : getPlaceholderHTML('检流计与电磁系仪表实训');
       } else if (activeCourse === '第二章第5-7节 电动系仪表&万用电表') {
-          return getPlaceholderHTML('电动系仪表与万用表实操');
+          return caseType === 'project'
+            ? dynamometerMultimeterCaseHTML
+            : getPlaceholderHTML('电动系仪表与万用表实操');
       } else if (activeCourse === '第二章第8-10节 直流电位差计&电子系电压表') {
-          return getPlaceholderHTML('直流电位差计与电子电压表');
+          return caseType === 'project'
+            ? potentiometerElectronicVoltmeterCaseHTML
+            : getPlaceholderHTML('直流电位差计与电子电压表');
       }
       return getPlaceholderHTML(`${activeCourse} 教学案例`);
   };
@@ -1717,7 +1749,16 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
         </div> 
       );
     }
-    if (mode === '上课') return ( <div className="flex gap-2 mt-4"><span className="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded border border-teal-100">已生成2个案例</span></div> );
+    if (mode === '上课') {
+      const caseCount = getModalOptions('上课', currentCourse).length;
+      return (
+        <div className="flex gap-2 mt-4">
+          <span className={`text-xs font-medium px-2 py-1 rounded border ${caseCount > 0 ? 'text-teal-600 bg-teal-50 border-teal-100' : 'text-slate-500 bg-slate-100 border-slate-200'}`}>
+            {caseCount > 0 ? `已生成${caseCount}个案例` : '暂未生成案例'}
+          </span>
+        </div>
+      );
+    }
     if (mode === '课后') {
       const isHwAssigned = homeworkState && homeworkState[currentCourse];
       const isEvaluated = evaluationState && evaluationState[currentCourse];
@@ -1739,13 +1780,9 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
     return null;
   };
 
-  const reqModules = selectedCourseTemp === '第一章第4-6节 误差的表示和消除' 
-    ? ['智能工厂配电系统故障诊断', '电压表出厂校验闯关']
-    : selectedCourseTemp === '第四章第1-5节 频率与相位的测量'
-      ? ['微分型频率表原理演示', '相序与相位差测定']
-      : [];
-      
-  const isBothCompleted = reqModules.length > 0 && reqModules.every(m => completedModules.includes(m));
+  const reqModules = selectedCourseTemp ? getModalOptions('上课', selectedCourseTemp).map(opt => opt.label) : [];
+  const isAllRequiredCompleted = reqModules.length > 0 && reqModules.every(m => completedModules.includes(m));
+  const evaluationLockText = reqModules.length > 1 ? '请先完成上方全部实训以解锁' : '请先完成上方实训以解锁';
 
   return (
     <div className={`min-h-[calc(100vh-64px)] bg-slate-50 py-10 transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
@@ -2027,12 +2064,12 @@ export const SubPageView = ({ title, icon: Icon, colorClass, isAnimating, naviga
                     )}
                   </div>
 
-                  {title === '上课' && (
+                  {title === '上课' && reqModules.length > 0 && (
                     <div className="mt-6 pt-6 border-t border-slate-100">
-                      <button disabled={!isBothCompleted} onClick={() => { setShowModal(false); setActiveCourse(selectedCourseTemp); navigateTo('上课-课堂评价'); }} className={`w-full py-4 rounded-xl flex items-center justify-center font-bold transition-all ${isBothCompleted ? 'bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-lg transform hover:-translate-y-0.5 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}>
-                        {!isBothCompleted && <Lock className="w-5 h-5 mr-2 opacity-60" />}
-                        {isBothCompleted && <BarChart3 className="w-5 h-5 mr-2" />}
-                        课堂评价 {isBothCompleted ? '' : '(请先完成上方两个实训以解锁)'}
+                      <button disabled={!isAllRequiredCompleted} onClick={() => { setShowModal(false); setActiveCourse(selectedCourseTemp); navigateTo('上课-课堂评价'); }} className={`w-full py-4 rounded-xl flex items-center justify-center font-bold transition-all ${isAllRequiredCompleted ? 'bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-lg transform hover:-translate-y-0.5 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}>
+                        {!isAllRequiredCompleted && <Lock className="w-5 h-5 mr-2 opacity-60" />}
+                        {isAllRequiredCompleted && <BarChart3 className="w-5 h-5 mr-2" />}
+                        课堂评价 {isAllRequiredCompleted ? '' : `(${evaluationLockText})`}
                       </button>
                     </div>
                   )}
@@ -2058,6 +2095,10 @@ export const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateT
   if (actionName === '电工测量方法排障实训') iframeContent = basicMeasurementTroubleshootingHTML;
   else if (actionName === '智能工厂配电系统故障诊断') iframeContent = ghostTrippingHTML;
   else if (actionName === '电压表出厂校验闯关') iframeContent = voltmeterSimHTML;
+  else if (actionName === '电压电流与磁电系仪表接入排障') iframeContent = voltageCurrentMagnetoelectricCaseHTML;
+  else if (actionName === '检流计零位漂移与电磁系仪表排障') iframeContent = galvanometerElectromagneticCaseHTML;
+  else if (actionName === '电动系功率表与万用表量程排障') iframeContent = dynamometerMultimeterCaseHTML;
+  else if (actionName === '直流电位差计与电子电压表高阻排障') iframeContent = potentiometerElectronicVoltmeterCaseHTML;
   else if (actionName === '微分型频率表原理演示') iframeContent = frequencyMeterHTMLTemplate.replace(/PAGE_TITLE/g, '微分型频率表原理演示').replace(/MODULE_NAME/g, '微分型频率表原理演示');
   else if (actionName === '相序与相位差测定') iframeContent = getPlaceholderHTML('相序与相位差测定');
 

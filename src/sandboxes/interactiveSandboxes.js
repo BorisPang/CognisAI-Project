@@ -68,6 +68,237 @@ const aiGuidanceModalScript = `
         }
 `;
 
+const createGuidedTroubleshootingHTML = ({
+    moduleName,
+    pageTitle,
+    background,
+    tag,
+    knowledge,
+    nodes,
+    readings,
+    logs,
+    stages,
+    summaryTitle,
+    summaryText
+}) => {
+    const nodeMarkup = nodes.map((node, index) => `<div class="node n${index + 1}">${node}</div>`).join('');
+    const readingMarkup = readings.map((item) => `
+                            <div class="meter-box">
+                                <strong>${item.label}</strong>
+                                <div class="reading ${item.tone || 'ok'}">${item.value}</div>
+                            </div>`).join('');
+    const logMarkup = logs.join('<br>');
+    const knowledgeMarkup = knowledge.map((item) => `<span>${item}</span>`).join('');
+
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>${moduleName} - AI 助教递进式诊断</title>
+    <style>
+        :root {
+            --bg: #f8fafc; --panel: #ffffff; --ink: #1e293b; --muted: #64748b;
+            --line: #dbe4ef; --blue: #2563eb; --teal: #0f766e; --amber: #d97706;
+            --green: #16a34a; --red: #dc2626;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "PingFang SC", sans-serif; }
+        .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
+        .hero { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-left: 5px solid var(--teal); border-radius: 16px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); }
+        .hero h1 { margin: 0 0 10px; font-size: 26px; color: #0f172a; }
+        .hero p { margin: 0; color: var(--muted); line-height: 1.7; }
+        .layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 22px; margin-top: 22px; align-items: stretch; }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 10px 30px rgba(15, 23, 42, .06); overflow: hidden; }
+        .card-header { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .card-header h2 { font-size: 18px; margin: 0; }
+        .tag { font-size: 12px; color: var(--blue); background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 8px; border-radius: 999px; font-weight: 700; white-space: nowrap; }
+        .scene { padding: 20px; display: grid; gap: 16px; }
+        .diagram { border: 1px solid #cbd5e1; border-radius: 14px; background: linear-gradient(180deg, #f8fafc, #eef6ff); padding: 20px; min-height: 260px; position: relative; }
+        .bus { height: 10px; background: #334155; border-radius: 99px; margin: 34px 28px 22px; position: relative; }
+        .node { position: absolute; top: -18px; width: 58px; height: 46px; border-radius: 999px; background: white; border: 3px solid #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; box-shadow: 0 8px 18px rgba(2, 132, 199, .18); font-size: 13px; }
+        .n1 { left: 8%; } .n2 { left: 44%; border-color: #f59e0b; } .n3 { right: 8%; border-color: #22c55e; }
+        .meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 48px; }
+        .meter-box { border: 1px solid #dbe4ef; background: white; border-radius: 12px; padding: 14px; min-height: 96px; }
+        .meter-box strong { display: block; font-size: 13px; margin-bottom: 8px; color: #475569; line-height: 1.4; }
+        .reading { font-size: 22px; font-weight: 900; color: #0f172a; }
+        .bad { color: var(--red); } .warn { color: var(--amber); } .ok { color: var(--green); } .neutral { color: var(--blue); }
+        .log { background: #0f172a; color: #dbeafe; border-radius: 12px; padding: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.75; }
+        .log b { color: #fde68a; }
+        .knowledge { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 20px; }
+        .knowledge span { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .coach { display: flex; flex-direction: column; min-height: 100%; }
+        .coach-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+        .progress { display: grid; grid-template-columns: repeat(${stages.length}, 1fr); gap: 8px; }
+        .dot { height: 8px; border-radius: 999px; background: #e2e8f0; }
+        .dot.active { background: var(--blue); }
+        .call-ai { width: 100%; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .call-ai:hover { background: #1e293b; }
+        .ai-box { border-left: 4px solid var(--blue); background: #eff6ff; border-radius: 0 12px 12px 0; padding: 16px; line-height: 1.7; color: #1e3a8a; }
+        .stage-title { margin: 0; font-size: 20px; color: #0f172a; }
+        .options { display: grid; gap: 10px; }
+        .option { width: 100%; text-align: left; border: 2px solid #e2e8f0; background: white; border-radius: 12px; padding: 14px 15px; cursor: pointer; color: #334155; font-size: 15px; line-height: 1.55; transition: .18s; }
+        .option:hover { border-color: #93c5fd; background: #f8fbff; }
+        .option.correct { border-color: var(--green); background: #ecfdf5; color: #166534; font-weight: 800; }
+        .option.wrong { border-color: var(--red); background: #fef2f2; color: #991b1b; }
+        .option:disabled { cursor: not-allowed; opacity: .75; }
+        .actions { display: flex; justify-content: space-between; gap: 12px; margin-top: auto; }
+        .btn { border: 0; border-radius: 11px; padding: 12px 16px; cursor: pointer; font-weight: 800; transition: .18s; }
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .feedback { min-height: 48px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; color: var(--muted); border: 1px dashed #cbd5e1; line-height: 1.6; }
+        .complete { background: #ecfdf5; border-color: #bbf7d0; color: #166534; font-weight: 800; }
+${aiGuidanceModalStyles}
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .meter { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="hero">
+            <h1>${pageTitle}</h1>
+            <p>${background}</p>
+        </section>
+
+        <main class="layout">
+            <section class="card">
+                <div class="card-header">
+                    <h2>现场图文场景</h2>
+                    <span class="tag">${tag}</span>
+                </div>
+                <div class="scene">
+                    <div class="diagram">
+                        <div class="bus">
+                            ${nodeMarkup}
+                        </div>
+                        <div class="meter">
+${readingMarkup}
+                        </div>
+                    </div>
+                    <div class="log">${logMarkup}</div>
+                </div>
+                <div class="knowledge">${knowledgeMarkup}</div>
+            </section>
+
+            <section class="card coach">
+                <div class="card-header">
+                    <h2>AI 助教递进式排障</h2>
+                    <span class="tag" id="stageLabel">第 1 / ${stages.length} 问</span>
+                </div>
+                <div class="coach-body">
+                    <div class="progress" id="progress"></div>
+                    <button class="btn call-ai" id="callAiBtn">一键呼叫 AI 助教</button>
+                    <h3 class="stage-title" id="stageTitle"></h3>
+                    <div class="ai-box" id="aiPrompt"></div>
+                    <div class="options" id="options"></div>
+                    <div class="feedback" id="feedback">点击选项后，AI 助教会给出下一步排障提示。</div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="resetBtn">重新排障</button>
+                        <button class="btn btn-primary" id="nextBtn" disabled>下一问</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+${aiGuidanceModalHTML}
+
+    <script>
+        const moduleName = ${JSON.stringify(moduleName)};
+        const stages = ${JSON.stringify(stages)};
+        const summaryTitle = ${JSON.stringify(summaryTitle)};
+        const summaryText = ${JSON.stringify(summaryText)};
+
+        let currentStage = 0;
+        let answered = false;
+        let assistantCalled = false;
+
+${aiGuidanceModalScript}
+
+        function render() {
+            const stage = stages[currentStage];
+            answered = false;
+            document.getElementById('progress').innerHTML = stages.map((_, index) => '<div class="dot ' + (assistantCalled && index <= currentStage ? 'active' : '') + '"></div>').join('');
+            if (!assistantCalled) {
+                document.getElementById('stageLabel').innerText = '待开始';
+                document.getElementById('stageTitle').innerText = '现场异常已加载';
+                document.getElementById('aiPrompt').innerText = '点击“一键呼叫 AI 助教”，系统会把这个项目案例拆成 ' + stages.length + ' 个递进排障问题，引导学生从现象读数一路追溯到仪表与测量方法本质。';
+                document.getElementById('options').innerHTML = '';
+                document.getElementById('feedback').className = 'feedback';
+                document.getElementById('feedback').innerText = '等待学生呼叫 AI 助教。';
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('nextBtn').innerText = '下一问';
+                document.getElementById('callAiBtn').disabled = false;
+                document.getElementById('callAiBtn').innerText = '一键呼叫 AI 助教';
+                return;
+            }
+            document.getElementById('stageLabel').innerText = '第 ' + (currentStage + 1) + ' / ' + stages.length + ' 问';
+            document.getElementById('stageTitle').innerText = stage.title;
+            document.getElementById('aiPrompt').innerText = stage.prompt;
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').innerText = '点击选项后，AI 助教会给出下一步排障提示。';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').innerText = currentStage === stages.length - 1 ? '完成实训' : '下一问';
+            document.getElementById('callAiBtn').disabled = true;
+            document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
+            document.getElementById('options').innerHTML = stage.options.map((option, index) =>
+                '<button class="option" data-index="' + index + '">' + option + '</button>'
+            ).join('');
+            Array.from(document.querySelectorAll('.option')).forEach(btn => {
+                btn.addEventListener('click', () => choose(Number(btn.dataset.index)));
+            });
+        }
+
+        function choose(index) {
+            if (answered) return;
+            const stage = stages[currentStage];
+            const optionButtons = Array.from(document.querySelectorAll('.option'));
+            optionButtons.forEach(btn => btn.classList.remove('wrong'));
+            if (index !== stage.answer) {
+                optionButtons[index].classList.add('wrong');
+                document.getElementById('feedback').innerText = 'AI 助教已给出引导提示，请返回重选。';
+                showGuidanceModal(stage.wrongFeedback);
+                return;
+            }
+            answered = true;
+            optionButtons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === stage.answer) btn.classList.add('correct');
+            });
+            document.getElementById('feedback').innerText = stage.feedback;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentStage < stages.length - 1) {
+                currentStage += 1;
+                render();
+            } else {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback complete';
+                feedback.innerText = summaryTitle + '：' + summaryText;
+                document.getElementById('nextBtn').disabled = true;
+                if (window.parent) window.parent.postMessage({ type: 'MODULE_COMPLETED', module: moduleName }, '*');
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            currentStage = 0;
+            assistantCalled = false;
+            render();
+        });
+
+        document.getElementById('callAiBtn').addEventListener('click', () => {
+            assistantCalled = true;
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>`;
+};
+
 // 1. 第一章第1-3节：电工测量方法排障项目案例
 export const basicMeasurementTroubleshootingHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -339,6 +570,302 @@ ${aiGuidanceModalScript}
     </script>
 </body>
 </html>`;
+
+// 2. 第二章第1-2节：电压电流与磁电系仪表
+export const voltageCurrentMagnetoelectricCaseHTML = createGuidedTroubleshootingHTML({
+    moduleName: '电压电流与磁电系仪表接入排障',
+    pageTitle: '24V 执行器供电异常：电压电流测量与磁电系仪表接入',
+    background: '背景：装配线执行器偶发动作迟缓，现场手持表显示负载端电压偏低。学生需要调用 AI 助教，从电压表并联、电流表串联、磁电系仪表特性和仪表内阻影响四个层面定位问题。',
+    tag: '知识点：电压测量 / 电流测量 / 磁电系仪表 / 仪表内阻',
+    knowledge: ['电压测量原理', '电流测量原理', '磁电系仪表结构', '仪表内阻影响'],
+    nodes: ['24V', 'METER', 'LOAD'],
+    readings: [
+        { label: '电源端电压', value: '23.8 V', tone: 'ok' },
+        { label: '串接电流读数', value: '0.18 A', tone: 'warn' },
+        { label: '负载端电压', value: '20.9 V', tone: 'bad' }
+    ],
+    logs: [
+        '[10:12:04] WARN actuator response delay',
+        '[10:12:19] INFO supply terminal voltage stable',
+        '[10:12:33] NOTE handheld meter moved between voltage and current checks',
+        '[10:12:50] CHECK load terminal voltage drops only during measurement',
+        '[10:13:08] TODO verify connection mode and meter internal resistance'
+    ],
+    stages: [
+        {
+            title: '第一问：先确认被测量与接入方式',
+            prompt: 'AI 助教：现场既要测电压又要测电流。为了避免仪表接错导致故障扩大，第一步应该确认什么？',
+            options: [
+                '电压表应串联，电流表应并联，这样读数更明显。',
+                '明确被测量：测电压时仪表并联在测点两端，测电流时仪表串联进入回路。',
+                '先把两个表都接在负载两端，读数越多越可靠。'
+            ],
+            answer: 1,
+            feedback: '正确。电压表并联、电流表串联是电压电流测量的基本接入规则，也是防止读数误判和回路扰动的第一步。',
+            wrongFeedback: '请先回到最基本的测量规则：电压看两点间电位差，电流看回路中通过的电荷量。接入方式错了，后面的读数都不可信。'
+        },
+        {
+            title: '第二问：判断磁电系仪表适用性',
+            prompt: 'AI 助教：这是一段 24V 直流执行器回路。选择磁电系仪表时，最需要注意哪一组条件？',
+            options: [
+                '适用于直流测量，并确认极性、量程和机械零位。',
+                '只要指针能摆动，就可以直接测任意交流或直流信号。',
+                '优先选最小量程，不需要考虑过载。'
+            ],
+            answer: 0,
+            feedback: '正确。磁电系仪表主要用于直流测量，现场必须确认极性、量程、零位和过载风险。',
+            wrongFeedback: '磁电系仪表不是“万能表头”。请重新考虑它的工作原理：永久磁场与通电线圈作用，通常适合直流测量，并且有极性要求。'
+        },
+        {
+            title: '第三问：分析仪表内阻影响',
+            prompt: 'AI 助教：负载端电压只有在接入测量时才明显下降。这里最可能是哪类问题？',
+            options: [
+                '执行器必然已经烧毁。',
+                'PLC 程序延迟导致所有电压读数变低。',
+                '仪表接入方式或内阻不合适，改变了被测回路状态。'
+            ],
+            answer: 2,
+            feedback: '正确。仪表会参与电路，电压表输入电阻、电流表内阻和接线方式都会改变被测对象状态。',
+            wrongFeedback: '请关注“只在接入测量时下降”这个线索。真实供电故障通常不只在接表瞬间出现，仪表内阻和接入方式才是关键变量。'
+        },
+        {
+            title: '第四问：形成处置结论',
+            prompt: 'AI 助教：现在要给出工程处置建议，哪一个结论最完整？',
+            options: [
+                '记录 20.9V 后直接更换执行器。',
+                '重新按电压并联、电流串联接入，选用合适量程和高输入电阻电压表，复核负载端真实电压。',
+                '把报警阈值调低，避免继续出现欠压提示。'
+            ],
+            answer: 1,
+            feedback: '完整。你把被测量、仪表类型、接入方式和仪表内阻影响串起来，形成了可执行的测量复核方案。',
+            wrongFeedback: '最终建议不能只盯单次读数。请把测量接入规则、仪表类型和内阻影响一起纳入诊断，先确认真实电压再处理设备。'
+        }
+    ],
+    summaryTitle: '实训完成',
+    summaryText: '已记录“电压电流与磁电系仪表接入排障”，学生完成了从接线规则到仪表内阻影响的诊断闭环。'
+});
+
+// 3. 第二章第3-4节：磁电系检流计与电磁系仪表
+export const galvanometerElectromagneticCaseHTML = createGuidedTroubleshootingHTML({
+    moduleName: '检流计零位漂移与电磁系仪表排障',
+    pageTitle: '桥式测量零位漂移：检流计灵敏度与电磁系仪表适用性',
+    background: '背景：实验台电桥平衡反复漂移，检流计指针微偏，同时电磁系仪表交直流读数不一致。学生需要判断零位、灵敏度、交直流适用性和桥式测量操作顺序。',
+    tag: '知识点：检流计灵敏度 / 电磁系仪表 / 交直流测量 / 桥式测量',
+    knowledge: ['检流计灵敏度', '电磁系仪表结构', '交直流测量', '桥式测量应用'],
+    nodes: ['BRIDGE', 'G', 'METER'],
+    readings: [
+        { label: '检流计零位偏移', value: '+3 div', tone: 'warn' },
+        { label: '电桥平衡指示', value: 'unstable', tone: 'bad' },
+        { label: '电磁表交流读数', value: '1.8 A', tone: 'neutral' }
+    ],
+    logs: [
+        '[11:05:12] WARN bridge balance point drifting',
+        '[11:05:20] INFO galvanometer pointer rests at +3 divisions',
+        '[11:05:35] NOTE student increased source voltage to make deflection visible',
+        '[11:06:01] CHECK electromagnetic meter reads on AC and DC ranges',
+        '[11:06:18] TODO confirm zero setting, sensitivity, and meter suitability'
+    ],
+    stages: [
+        {
+            title: '第一问：先校正检流计零位',
+            prompt: 'AI 助教：电桥还没调平前，检流计已经停在 +3 格。最先应该做什么？',
+            options: [
+                '直接调电桥电阻，让指针回到零位。',
+                '先检查机械零位和外界干扰，再进行电桥平衡判断。',
+                '提高电源电压，让偏转更明显。'
+            ],
+            answer: 1,
+            feedback: '正确。检流计用于判断微小电流是否为零，零位不准会直接破坏桥式测量的判断基础。',
+            wrongFeedback: '检流计的核心作用是判断“是否有微小电流”。零位没有校准前，所谓平衡点很可能只是仪表偏置。'
+        },
+        {
+            title: '第二问：理解灵敏度与保护',
+            prompt: 'AI 助教：学生想提高电源电压让指针更明显，这样做最大的风险是什么？',
+            options: [
+                '检流计灵敏度高，过大电流可能造成指针撞针或线圈损伤。',
+                '电压越高测量越准确，没有风险。',
+                '只会改变表盘颜色，不影响测量。'
+            ],
+            answer: 0,
+            feedback: '正确。检流计高灵敏度带来高分辨能力，也意味着必须限流保护，不能粗暴提高激励。',
+            wrongFeedback: '请把“灵敏度高”理解成双刃剑：它能发现微小不平衡，也更容易被过大电流损伤。'
+        },
+        {
+            title: '第三问：判断电磁系仪表适用性',
+            prompt: 'AI 助教：现场要复核一段交流回路电流，为什么可以考虑电磁系仪表？',
+            options: [
+                '电磁系仪表靠固定线圈磁场吸引软铁片，可用于交直流测量。',
+                '电磁系仪表只能测直流微小电流。',
+                '电磁系仪表不需要接入回路也能读数。'
+            ],
+            answer: 0,
+            feedback: '正确。电磁系仪表结构决定了它可用于交直流测量，但精度和刻度特性仍需关注。',
+            wrongFeedback: '请回想电磁系仪表的转矩形成：电流通过固定线圈产生磁场吸引软铁片，这与磁电系仪表不同。'
+        },
+        {
+            title: '第四问：形成桥式测量操作链',
+            prompt: 'AI 助教：哪一个操作顺序更符合桥式测量的工程规范？',
+            options: [
+                '先大幅提高电源，再看哪个读数最大。',
+                '校零和限流保护先行，再逐步调桥臂，最后用合适仪表复核交直流支路。',
+                '只要检流计有偏转，就判定被测元件损坏。'
+            ],
+            answer: 1,
+            feedback: '完整。你把检流计零位、灵敏度保护、电磁系仪表适用性和桥式测量流程连接起来了。',
+            wrongFeedback: '桥式测量不是比谁偏得大，而是找平衡。请按“校零-保护-调平-复核”的顺序组织诊断。'
+        }
+    ],
+    summaryTitle: '实训完成',
+    summaryText: '已记录“检流计零位漂移与电磁系仪表排障”，学生完成了桥式测量中的零位、灵敏度和仪表适用性分析。'
+});
+
+// 4. 第二章第5-7节：电动系仪表与万用电表
+export const dynamometerMultimeterCaseHTML = createGuidedTroubleshootingHTML({
+    moduleName: '电动系功率表与万用表量程排障',
+    pageTitle: '小型电机功率读数异常：电动系仪表与万用表协同诊断',
+    background: '背景：小型单相电机维护时，功率表读数明显偏低，万用表换挡后读数跳变。学生需要从电动系仪表功率测量、接线方式、万用表结构和量程选择排查问题。',
+    tag: '知识点：电动系仪表 / 功率测量 / 万用表结构 / 量程选择',
+    knowledge: ['电动系仪表原理', '功率测量应用', '万用表结构', '量程选择'],
+    nodes: ['AC', 'W', 'MOTOR'],
+    readings: [
+        { label: '功率表读数', value: '86 W', tone: 'bad' },
+        { label: '电压支路读数', value: '219 V', tone: 'ok' },
+        { label: '万用表电流档', value: 'OL', tone: 'warn' }
+    ],
+    logs: [
+        '[14:20:03] WARN motor power lower than expected',
+        '[14:20:19] NOTE wattmeter current coil and voltage coil checked',
+        '[14:20:42] INFO multimeter current range changed during live measurement',
+        '[14:20:58] CHECK voltage branch stable at 219V',
+        '[14:21:10] TODO verify wattmeter wiring and multimeter range'
+    ],
+    stages: [
+        {
+            title: '第一问：先确认功率表接线',
+            prompt: 'AI 助教：电动系功率表读数偏低。第一步应该核对哪一项？',
+            options: [
+                '核对电流线圈串联、电压线圈并联，以及同名端方向是否正确。',
+                '只看表盘是否有划痕。',
+                '把万用表改到蜂鸣档即可判断功率。'
+            ],
+            answer: 0,
+            feedback: '正确。功率表读数依赖电流线圈、电压线圈以及相位关系，接线方向错会直接导致读数异常。',
+            wrongFeedback: '功率表不是单一电压或电流表。请先核对电流线圈、电压线圈和同名端方向。'
+        },
+        {
+            title: '第二问：理解电动系仪表原理',
+            prompt: 'AI 助教：为什么电动系仪表可以用于功率测量？',
+            options: [
+                '因为它只测电压，不考虑电流。',
+                '因为固定线圈与可动线圈相互作用，转矩与电压电流及相位关系相关。',
+                '因为它不需要接入电路。'
+            ],
+            answer: 1,
+            feedback: '正确。电动系功率表通过电压、电流线圈的相互作用反映有功功率，因此特别适合功率测量教学。',
+            wrongFeedback: '请回到电动系仪表的力矩来源：两个通电线圈之间相互作用，不是单看电压或单看电流。'
+        },
+        {
+            title: '第三问：处理万用表量程跳变',
+            prompt: 'AI 助教：万用表电流档显示 OL，学生准备不断换挡。哪种处理更稳妥？',
+            options: [
+                '带电随意换挡，直到出现数字。',
+                '先断开回路，估算量级，从高量程开始并确认表笔插孔和保险状态。',
+                '改用电阻档测正在工作的电机。'
+            ],
+            answer: 1,
+            feedback: '正确。万用表量程选择必须先保护仪表和人身安全，从高量程开始逐步下调。',
+            wrongFeedback: '万用表不是随手换挡的工具。请同时考虑量程、表笔插孔、保险丝和是否带电切换。'
+        },
+        {
+            title: '第四问：形成协同诊断结论',
+            prompt: 'AI 助教：最终应该如何判断这次读数异常？',
+            options: [
+                '功率表偏低一定说明电机效率变高。',
+                '先修正功率表接线，再用万用表按正确量程复核电压电流，综合判断负载功率。',
+                '只保留万用表读数，删除功率表记录。'
+            ],
+            answer: 1,
+            feedback: '完整。你把电动系功率表接线、仪表原理和万用表量程保护串成了协同诊断流程。',
+            wrongFeedback: '最终结论要能解释两个仪表的异常表现。请先修正功率表接线，再让万用表承担复核角色。'
+        }
+    ],
+    summaryTitle: '实训完成',
+    summaryText: '已记录“电动系功率表与万用表量程排障”，学生完成了功率表接线和万用表量程选择的综合诊断。'
+});
+
+// 5. 第二章第8-10节：直流电位差计与电子系电压表
+export const potentiometerElectronicVoltmeterCaseHTML = createGuidedTroubleshootingHTML({
+    moduleName: '直流电位差计与电子电压表高阻排障',
+    pageTitle: '微弱直流信号校准异常：补偿测量与高阻抗电压表诊断',
+    background: '背景：温度变送器 100mV 标定时，普通电压表读数偏低，直流电位差计补偿平衡困难。学生需要从补偿测量、标准电池、工作电流校准和电子电压表高输入阻抗排查问题。',
+    tag: '知识点：补偿测量 / 标准电池 / 电子电压表 / 高阻抗测量',
+    knowledge: ['补偿测量原理', '标准电池', '电子电压表特点', '高阻抗测量'],
+    nodes: ['STD', 'POT', 'SENSOR'],
+    readings: [
+        { label: '普通表读数', value: '92 mV', tone: 'bad' },
+        { label: '补偿平衡点', value: '99.8 mV', tone: 'ok' },
+        { label: '电子表输入阻抗', value: '10 MΩ', tone: 'neutral' }
+    ],
+    logs: [
+        '[15:40:07] WARN transmitter calibration drift reported',
+        '[15:40:22] INFO standard cell reference stable',
+        '[15:40:35] NOTE ordinary voltmeter loads weak signal source',
+        '[15:41:02] CHECK potentiometer balance near 99.8mV',
+        '[15:41:20] TODO verify compensation current and high impedance measurement'
+    ],
+    stages: [
+        {
+            title: '第一问：判断普通电压表读数偏低原因',
+            prompt: 'AI 助教：100mV 微弱信号用普通电压表测得 92mV。最应优先怀疑什么？',
+            options: [
+                '被测信号一定真实只有 92mV。',
+                '普通电压表输入阻抗不足，对微弱信号源产生负载效应。',
+                '标准电池颜色不够亮。'
+            ],
+            answer: 1,
+            feedback: '正确。微弱信号源内阻较高时，普通电压表可能拉低被测电压，高输入阻抗仪表更合适。',
+            wrongFeedback: '请关注“微弱信号”和“普通表”两个线索。测量仪表可能改变被测对象，输入阻抗不足会造成负载效应。'
+        },
+        {
+            title: '第二问：理解直流电位差计补偿测量',
+            prompt: 'AI 助教：为什么直流电位差计适合高准确度测量微弱直流电压？',
+            options: [
+                '因为补偿平衡时几乎不从被测对象取电流。',
+                '因为它会主动放大被测信号。',
+                '因为它可以跳过标准量具校准。'
+            ],
+            answer: 0,
+            feedback: '正确。补偿法在平衡时对被测回路影响极小，适合精密直流电压测量。',
+            wrongFeedback: '补偿测量的关键不是放大，而是平衡。请思考平衡时检流计近零、电流不流经被测支路的意义。'
+        },
+        {
+            title: '第三问：校准标准与工作电流',
+            prompt: 'AI 助教：补偿平衡困难时，应该先确认哪一个基准环节？',
+            options: [
+                '标准电池和工作电流校准是否可靠。',
+                '仪表外壳是否足够新。',
+                '把所有接线都换成更长的线。'
+            ],
+            answer: 0,
+            feedback: '正确。直流电位差计依赖标准电池和工作电流建立基准，基准不稳会直接导致补偿失准。',
+            wrongFeedback: '请先找“基准”。没有稳定标准电池和工作电流，补偿平衡点就没有可信依据。'
+        },
+        {
+            title: '第四问：形成测量方案',
+            prompt: 'AI 助教：最终怎样给出可靠标定方案？',
+            options: [
+                '只采用普通电压表 92mV，直接判定变送器不合格。',
+                '先用标准电池校准工作电流，再用电位差计补偿测量，并用高输入阻抗电子电压表复核。',
+                '把量程调大，读数自然会接近 100mV。'
+            ],
+            answer: 1,
+            feedback: '完整。你把补偿测量、标准基准和高阻抗复核组合成了微弱直流信号的可靠标定流程。',
+            wrongFeedback: '微弱信号标定不能只看一次普通表读数。请建立标准基准，再用补偿法和高输入阻抗仪表交叉验证。'
+        }
+    ],
+    summaryTitle: '实训完成',
+    summaryText: '已记录“直流电位差计与电子电压表高阻排障”，学生完成了微弱直流信号的补偿测量与高阻抗复核流程。'
+});
 
 // 1. 第一章：配电系统故障诊断沙盘
 export const ghostTrippingHTML = `<!DOCTYPE html>
