@@ -85,7 +85,7 @@ const getGeneratedCaseSummaries = (activeCourse, generatedCaseState = {}) => {
   return cases;
 };
 
-export const Navbar = ({ navigateTo }) => {
+export const Navbar = ({ navigateTo, onClearLocalMemory }) => {
   const [openMenu, setOpenMenu] = useState(null);
   const menuRef = useRef(null);
 
@@ -141,8 +141,17 @@ export const Navbar = ({ navigateTo }) => {
                 <User className="h-4 w-4 text-slate-600" />
               </button>
               {openMenu === 'account' && (
-                <div className="absolute right-0 top-10 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-3 px-4 text-sm text-slate-600">
-                  请联系管理员添加账户
+                <div className="absolute right-0 top-10 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-3 text-sm text-slate-600">
+                  <div className="px-4 pb-3">请联系管理员添加账户</div>
+                  <div className="border-t border-slate-100 pt-2 px-2">
+                    <button
+                      type="button"
+                      onClick={onClearLocalMemory}
+                      className="w-full text-left px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-red-600 transition-colors"
+                    >
+                      清除本地记忆
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
