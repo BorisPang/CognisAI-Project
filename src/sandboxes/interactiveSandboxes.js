@@ -1245,9 +1245,8 @@ const createDifferentiatedCourseCaseHTML = ({
         .btn-nav { background: #4a4a72; color: #e5e7eb; } .btn-nav:hover:not(:disabled) { background: #62628f; }
         .btn:disabled { opacity: .45; cursor: not-allowed; }
         .page-label { color: #f8fafc; font-weight: 900; }
-        .btn-start { color: #06111f; padding: 16px 34px; box-shadow: 0 0 20px rgba(24,213,255,.24); }
-        .bridge .btn-start { background: #5eead4; } .power .btn-start { background: #fbbf24; } .calibration .btn-start { background: #c4b5fd; }
-        .btn-start:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+        .btn-start { background: #18d5ff; color: #06111f; padding: 16px 38px; box-shadow: 0 0 20px rgba(24,213,255,.25); }
+        .btn-start:hover:not(:disabled) { background: #67e8f9; transform: translateY(-1px); }
         .quiz-panel { width: 0; display: none; flex-direction: column; background: #19192d; border: 1px solid var(--line); border-radius: 12px; overflow: auto; padding: 22px; transition: width .45s ease; }
         .quiz-panel.open { display: flex; width: min(42%, 560px); }
         .main-content.ai-active { flex-direction: column; }
@@ -1862,8 +1861,8 @@ export const ghostTrippingHTML = `<!DOCTYPE html>
         .btn { background: var(--border-color); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn:hover:not(:disabled) { background: #555577; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-start { background: var(--accent-blue); color: #000; font-size: 16px; padding: 12px 30px; box-shadow: 0 0 15px rgba(0,210,255,0.4);}
-        .btn-start:hover { background: #00b8e6; }
+        .btn-start { background: #18d5ff; color: #06111f; font-size: 16px; padding: 16px 38px; box-shadow: 0 0 20px rgba(24,213,255,.25); }
+        .btn-start:hover:not(:disabled) { background: #67e8f9; transform: translateY(-1px); }
         .quiz-panel { flex: 1; background: #1a1a2e; padding: 40px; display: none; flex-direction: column; overflow-y: auto; border-left: 2px solid var(--border-color); }
         .stage-title { color: var(--accent-blue); font-size: 24px; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-top: 0;}
         .ai-dialogue { background: rgba(0, 210, 255, 0.1); border-left: 4px solid var(--accent-blue); padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 30px; font-size: 18px; line-height: 1.6; }
