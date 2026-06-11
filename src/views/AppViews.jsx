@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BookOpen, MonitorPlay, ClipboardCheck, ArrowRight, BrainCircuit, User, Bell, Search, BarChart3, ChevronRight, X, FileText, CheckCircle, Wrench, FileQuestion, Sparkles, Loader2, Lock, AlertCircle, TrendingUp, Users, Target, CheckCircle2, Clock, FileSpreadsheet, ChevronDown, ChevronUp, UploadCloud, RefreshCw, CheckSquare, Presentation, Lightbulb, ArrowDownToLine, Layers, Settings2, Send, MessageSquare, Activity } from 'lucide-react';
 import { courseList, knowledgeModules, knowledgePointMockData, radarDimensions, studentRadarData, teachingGuides } from '../data/courseData';
 import { generateWithGemini } from '../services/gemini';
-import { basicMeasurementTroubleshootingHTML, dynamometerMultimeterCaseHTML, frequencyMeterHTMLTemplate, galvanometerElectromagneticCaseHTML, getPlaceholderHTML, ghostTrippingHTML, potentiometerElectronicVoltmeterCaseHTML, voltageCurrentMagnetoelectricCaseHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
+import { basicMeasurementTroubleshootingHTML, bridgeCalibrationJudgementHTML, frequencyMeterHTMLTemplate, getPlaceholderHTML, ghostTrippingHTML, precisionDcCalibrationHTML, singlePhasePowerWorkOrderHTML, voltageCurrentMagnetoelectricCaseHTML, voltmeterSimHTML } from '../sandboxes/interactiveSandboxes';
 
 // --- 动态获取弹窗选项 ---
 const getModalOptions = (title, course) => {
@@ -27,17 +27,17 @@ const getModalOptions = (title, course) => {
     }
     if (course === '第二章第3-4节 磁电系检流计&电磁系仪表') {
       return [
-        { label: '检流计零位漂移与电磁系仪表排障', path: '上课-检流计零位漂移与电磁系仪表排障', icon: Wrench }
+        { label: '桥式测量调零与仪表判读实验', path: '上课-桥式测量调零与仪表判读实验', icon: CheckCircle }
       ];
     }
     if (course === '第二章第5-7节 电动系仪表&万用电表') {
       return [
-        { label: '电动系功率表与万用表量程排障', path: '上课-电动系功率表与万用表量程排障', icon: Wrench }
+        { label: '单相电机功率测量工单', path: '上课-单相电机功率测量工单', icon: FileSpreadsheet }
       ];
     }
     if (course === '第二章第8-10节 直流电位差计&电子系电压表') {
       return [
-        { label: '直流电位差计与电子电压表高阻排障', path: '上课-直流电位差计与电子电压表高阻排障', icon: Wrench }
+        { label: '微弱直流信号精密标定', path: '上课-微弱直流信号精密标定', icon: Target }
       ];
     }
     if (course === '第四章第1-5节 频率与相位的测量') {
@@ -59,9 +59,9 @@ const getGeneratedCaseSummaries = (activeCourse, generatedCaseState = {}) => {
       '第一章第1-3节 电工仪表与测量的基本方法': '电工测量方法排障实训',
       '第一章第4-6节 误差的表示和消除': '智能工厂配电系统故障诊断',
       '第二章第1-2节 电压与电流的测量&磁电系仪表': '电压电流与磁电系仪表接入排障',
-      '第二章第3-4节 磁电系检流计&电磁系仪表': '检流计零位漂移与电磁系仪表排障',
-      '第二章第5-7节 电动系仪表&万用电表': '电动系功率表与万用表量程排障',
-      '第二章第8-10节 直流电位差计&电子系电压表': '直流电位差计与电子电压表高阻排障',
+      '第二章第3-4节 磁电系检流计&电磁系仪表': '桥式测量调零与仪表判读实验',
+      '第二章第5-7节 电动系仪表&万用电表': '单相电机功率测量工单',
+      '第二章第8-10节 直流电位差计&电子系电压表': '微弱直流信号精密标定',
       '第四章第1-5节 频率与相位的测量': '大型变电站频率异常排查'
     };
     cases.push({
@@ -373,15 +373,15 @@ const CaseGenerationView = ({ activeCourse, generatedCaseState, setCaseGeneratio
             : getPlaceholderHTML('磁电系电压表电流表校准');
       } else if (activeCourse === '第二章第3-4节 磁电系检流计&电磁系仪表') {
           return caseType === 'project'
-            ? galvanometerElectromagneticCaseHTML
+            ? bridgeCalibrationJudgementHTML
             : getPlaceholderHTML('检流计与电磁系仪表实训');
       } else if (activeCourse === '第二章第5-7节 电动系仪表&万用电表') {
           return caseType === 'project'
-            ? dynamometerMultimeterCaseHTML
+            ? singlePhasePowerWorkOrderHTML
             : getPlaceholderHTML('电动系仪表与万用表实操');
       } else if (activeCourse === '第二章第8-10节 直流电位差计&电子系电压表') {
           return caseType === 'project'
-            ? potentiometerElectronicVoltmeterCaseHTML
+            ? precisionDcCalibrationHTML
             : getPlaceholderHTML('直流电位差计与电子电压表');
       }
       return getPlaceholderHTML(`${activeCourse} 教学案例`);
@@ -2151,9 +2151,9 @@ export const ActionDetailView = ({ pageKey, activeCourse, isAnimating, navigateT
   else if (actionName === '智能工厂配电系统故障诊断') iframeContent = ghostTrippingHTML;
   else if (actionName === '电压表出厂校验闯关') iframeContent = voltmeterSimHTML;
   else if (actionName === '电压电流与磁电系仪表接入排障') iframeContent = voltageCurrentMagnetoelectricCaseHTML;
-  else if (actionName === '检流计零位漂移与电磁系仪表排障') iframeContent = galvanometerElectromagneticCaseHTML;
-  else if (actionName === '电动系功率表与万用表量程排障') iframeContent = dynamometerMultimeterCaseHTML;
-  else if (actionName === '直流电位差计与电子电压表高阻排障') iframeContent = potentiometerElectronicVoltmeterCaseHTML;
+  else if (actionName === '桥式测量调零与仪表判读实验') iframeContent = bridgeCalibrationJudgementHTML;
+  else if (actionName === '单相电机功率测量工单') iframeContent = singlePhasePowerWorkOrderHTML;
+  else if (actionName === '微弱直流信号精密标定') iframeContent = precisionDcCalibrationHTML;
   else if (actionName === '微分型频率表原理演示') iframeContent = frequencyMeterHTMLTemplate.replace(/PAGE_TITLE/g, '微分型频率表原理演示').replace(/MODULE_NAME/g, '微分型频率表原理演示');
   else if (actionName === '相序与相位差测定') iframeContent = getPlaceholderHTML('相序与相位差测定');
 

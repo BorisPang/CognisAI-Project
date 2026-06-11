@@ -1163,6 +1163,674 @@ export const potentiometerElectronicVoltmeterCaseHTML = createGuidedTroubleshoot
     summaryText: '已记录“直流电位差计与电子电压表高阻排障”，学生完成了微弱直流信号的补偿测量与高阻抗复核流程。'
 });
 
+const createDifferentiatedCourseCaseHTML = ({
+    moduleName,
+    pageTitle,
+    statusText,
+    accentClass,
+    aiButtonLabel,
+    aiPanelTitle,
+    pages,
+    stages,
+    summaryTitle,
+    summaryText
+}) => {
+    const pageMarkup = pages.map((page, index) => `
+            <section class="sheet ${index === 0 ? 'active' : ''}" id="page${index + 1}">
+                <div class="sheet-kicker">${page.kicker}</div>
+                <h2>${page.title} (P${index + 1}/4)</h2>
+                ${page.body}
+            </section>`).join('');
+
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>${moduleName}</title>
+    <style>
+        :root {
+            --bg-dark: #161629; --panel-bg: #292943; --panel-deep: #1f1f35;
+            --line: #4a4a70; --paper: #ffffff; --ink: #1f2937; --muted: #64748b;
+            --cyan: #18d5ff; --green: #22c55e; --amber: #f59e0b; --violet: #8b5cf6; --red: #ef4444;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; background: #f8fafc; color: #e5e7eb; font-family: "Segoe UI", "PingFang SC", sans-serif; }
+        .case-shell { width: min(96vw, 1480px); min-height: 780px; margin: 24px auto 36px; background: var(--bg-dark); border-radius: 22px; box-shadow: 0 22px 58px rgba(15,23,42,.34); overflow: hidden; border: 1px solid var(--line); display: flex; flex-direction: column; }
+        .case-header { background: #151525; border-bottom: 2px solid var(--line); padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+        .case-header h1 { margin: 0; font-size: 25px; letter-spacing: 1px; color: var(--cyan); }
+        .status { display: flex; align-items: center; gap: 10px; color: #f8fafc; font-weight: 900; white-space: nowrap; }
+        .status::before { content: ""; width: 12px; height: 12px; border-radius: 999px; background: var(--green); box-shadow: 0 0 16px rgba(34,197,94,.55); }
+        .main-content { flex: 1; background: var(--panel-bg); padding: 24px; display: flex; gap: 22px; min-height: 650px; }
+        .document-viewer { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .sheet { flex: 1; display: none; background: var(--paper); color: var(--ink); border-radius: 10px; padding: 34px 38px; overflow: auto; box-shadow: inset 0 0 0 1px #e5e7eb, 0 10px 24px rgba(0,0,0,.18); }
+        .sheet.active { display: block; }
+        .sheet-kicker { color: var(--muted); font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+        .sheet h2 { margin: 0 0 18px; padding-bottom: 12px; border-bottom: 3px solid #111827; font-size: 27px; }
+        .sheet h3 { margin: 20px 0 12px; font-size: 18px; }
+        .sheet p { color: #4b5563; line-height: 1.72; }
+        .grid-2 { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .card { border: 1px solid #d5dce8; border-radius: 10px; background: #f8fafc; padding: 15px; }
+        .card.white { background: #fff; }
+        .metric span { display: block; color: var(--muted); font-size: 12px; font-weight: 900; margin-bottom: 6px; }
+        .metric strong { display: block; font-size: 25px; color: #111827; }
+        .metric small { color: #64748b; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #111827; color: #f8fafc; text-align: left; padding: 10px; }
+        td { border: 1px solid #e5e7eb; padding: 9px 10px; color: #374151; vertical-align: top; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .ok { color: #16a34a !important; } .warn { color: #d97706 !important; } .bad { color: #dc2626 !important; } .info { color: #0284c7 !important; } .violet { color: #7c3aed !important; }
+        .lab-diagram, .work-diagram, .cal-diagram { min-height: 260px; border-radius: 12px; border: 1px solid #cbd5e1; background: linear-gradient(180deg, #f8fafc, #eef6ff); position: relative; overflow: hidden; }
+        .bridge-arm { position: absolute; width: 30%; height: 8px; background: #334155; transform-origin: left center; border-radius: 999px; }
+        .bridge-arm.a1 { left: 18%; top: 92px; transform: rotate(26deg); } .bridge-arm.a2 { right: 18%; top: 92px; transform: rotate(154deg); }
+        .bridge-arm.a3 { left: 18%; bottom: 92px; transform: rotate(-26deg); } .bridge-arm.a4 { right: 18%; bottom: 92px; transform: rotate(-154deg); }
+        .junction { position: absolute; width: 54px; height: 54px; border-radius: 50%; background: #fff; border: 3px solid var(--cyan); display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .junction.top { left: calc(50% - 27px); top: 36px; } .junction.left { left: 70px; top: calc(50% - 27px); border-color: var(--amber); }
+        .junction.right { right: 70px; top: calc(50% - 27px); border-color: var(--green); } .junction.bottom { left: calc(50% - 27px); bottom: 36px; border-color: var(--violet); }
+        .galvo { position: absolute; left: calc(50% - 58px); top: calc(50% - 30px); width: 116px; height: 60px; border-radius: 999px; border: 3px solid #111827; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .coil { position: absolute; border: 3px solid #111827; border-radius: 12px; background: #fff; padding: 12px 18px; font-weight: 900; }
+        .coil.current { left: 8%; top: 82px; border-color: var(--amber); } .coil.voltage { right: 8%; top: 82px; border-color: var(--cyan); }
+        .load { position: absolute; left: calc(50% - 78px); top: 82px; width: 156px; height: 76px; border-radius: 14px; background: #111827; color: white; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .wire { position: absolute; left: 14%; right: 14%; top: 120px; height: 8px; background: #334155; border-radius: 999px; }
+        .terminal { position: absolute; top: 52px; width: 86px; height: 86px; border-radius: 50%; background: #fff; border: 3px solid var(--green); display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .terminal.std { left: 8%; border-color: var(--violet); } .terminal.pot { left: calc(50% - 43px); border-color: var(--cyan); } .terminal.dut { right: 8%; border-color: var(--amber); }
+        .cal-line { position: absolute; left: 13%; right: 13%; top: 95px; height: 8px; background: #334155; border-radius: 999px; }
+        .ledger-row { display: grid; grid-template-columns: 160px 1fr 130px; gap: 10px; align-items: center; margin: 10px 0; }
+        .ledger-track { height: 20px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+        .ledger-fill { height: 100%; border-radius: 999px; background: var(--cyan); }
+        .footer-controls { margin-top: 18px; background: var(--panel-deep); border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+        .page-controls { display: flex; align-items: center; gap: 18px; }
+        .btn { border: 0; border-radius: 7px; padding: 13px 24px; cursor: pointer; font-weight: 900; font-size: 16px; transition: .2s; }
+        .btn-nav { background: #4a4a72; color: #e5e7eb; } .btn-nav:hover:not(:disabled) { background: #62628f; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .page-label { color: #f8fafc; font-weight: 900; }
+        .btn-start { color: #06111f; padding: 16px 34px; box-shadow: 0 0 20px rgba(24,213,255,.24); }
+        .bridge .btn-start { background: #5eead4; } .power .btn-start { background: #fbbf24; } .calibration .btn-start { background: #c4b5fd; }
+        .btn-start:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+        .quiz-panel { width: 0; display: none; flex-direction: column; background: #19192d; border: 1px solid var(--line); border-radius: 12px; overflow: auto; padding: 22px; transition: width .45s ease; }
+        .quiz-panel.open { display: flex; width: min(42%, 560px); }
+        .main-content.ai-active { flex-direction: column; }
+        .main-content.ai-active .document-viewer { flex: none; }
+        .main-content.ai-active .sheet { flex: none; min-height: 520px; max-height: 640px; }
+        .main-content.ai-active .quiz-panel.open { width: 100%; min-height: 360px; }
+        .main-content.ai-active .options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+        .main-content.ai-active .option { min-height: 116px; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+        .quiz-header h2 { margin: 0; color: var(--cyan); font-size: 22px; }
+        .stage-label { color: #cbd5e1; background: #2b2b45; border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .ai-dialogue { background: rgba(24,213,255,.1); border-left: 4px solid var(--cyan); padding: 16px; border-radius: 0 8px 8px 0; line-height: 1.7; color: #dbeafe; margin-bottom: 18px; }
+        .stage-title { color: var(--cyan); font-size: 22px; margin: 0 0 14px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #2b2b45; color: #f8fafc; border: 2px solid var(--line); border-radius: 8px; padding: 16px; text-align: left; cursor: pointer; line-height: 1.55; font-size: 15px; }
+        .option:hover { border-color: var(--cyan); background: #333352; }
+        .option.correct { border-color: var(--green); color: #bbf7d0; background: rgba(34,197,94,.12); }
+        .option.wrong { border-color: var(--red); color: #fecaca; background: rgba(239,68,68,.12); }
+        .option:disabled { cursor: not-allowed; opacity: .75; }
+        .feedback { margin-top: 16px; min-height: 58px; padding: 13px 14px; border-radius: 8px; border: 1px dashed var(--line); color: #cbd5e1; line-height: 1.6; }
+        .feedback.complete { background: rgba(34,197,94,.12); border-color: var(--green); color: #bbf7d0; font-weight: 900; }
+        .quiz-actions { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; gap: 12px; }
+        .btn-secondary { background: #33334f; color: #dbeafe; }
+        .btn-primary { background: var(--cyan); color: #06111f; }
+${aiGuidanceModalStyles}
+        @media (max-width: 980px) {
+            .case-shell { width: 100vw; min-height: 100vh; margin: 0; border-radius: 0; }
+            .case-header { flex-direction: column; align-items: flex-start; }
+            .main-content { flex-direction: column; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .quiz-panel.open { width: 100%; }
+            .main-content.ai-active .options { grid-template-columns: 1fr; }
+            .footer-controls { flex-direction: column; align-items: stretch; }
+            .btn-start { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="case-shell ${accentClass}">
+    <div class="case-header">
+        <h1>${pageTitle}</h1>
+        <div class="status">${statusText}</div>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="document-viewer">
+${pageMarkup}
+            <div class="footer-controls">
+                <div class="page-controls">
+                    <button class="btn btn-nav" id="btnPrev" onclick="changePage(-1)" disabled>上一页</button>
+                    <span class="page-label">Page <span id="pageNum">1</span> / 4</span>
+                    <button class="btn btn-nav" id="btnNext" onclick="changePage(1)">下一页</button>
+                </div>
+                <button class="btn btn-start" id="callAiBtn" onclick="startAi()">${aiButtonLabel}</button>
+            </div>
+        </div>
+        <aside class="quiz-panel" id="quizPanel">
+            <div class="quiz-header">
+                <h2>${aiPanelTitle}</h2>
+                <span class="stage-label" id="stageLabel">第 1 / ${stages.length} 问</span>
+            </div>
+            <h3 class="stage-title" id="stageTitle"></h3>
+            <div class="ai-dialogue" id="aiPrompt"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback">点击选项后，AI 助教会给出下一步提示。</div>
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="resetBtn">重新开始</button>
+                <button class="btn btn-primary" id="nextBtn" disabled>下一问</button>
+            </div>
+        </aside>
+    </div>
+</div>
+${aiGuidanceModalHTML}
+<script>
+    const moduleName = ${JSON.stringify(moduleName)};
+    const stages = ${JSON.stringify(stages)};
+    const summaryTitle = ${JSON.stringify(summaryTitle)};
+    const summaryText = ${JSON.stringify(summaryText)};
+    let currentPage = 1;
+    let currentStage = 0;
+    let answered = false;
+${aiGuidanceModalScript}
+    function changePage(delta) {
+        document.getElementById('page' + currentPage).classList.remove('active');
+        currentPage += delta;
+        document.getElementById('page' + currentPage).classList.add('active');
+        document.getElementById('pageNum').innerText = currentPage;
+        document.getElementById('btnPrev').disabled = currentPage === 1;
+        document.getElementById('btnNext').disabled = currentPage === 4;
+    }
+    function startAi() {
+        document.getElementById('mainContent').classList.add('ai-active');
+        document.getElementById('quizPanel').classList.add('open');
+        document.getElementById('callAiBtn').disabled = true;
+        document.getElementById('callAiBtn').innerText = 'AI 助教已接入';
+        currentStage = 0;
+        renderStage();
+        document.getElementById('quizPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function renderStage() {
+        const stage = stages[currentStage];
+        answered = false;
+        document.getElementById('stageLabel').innerText = '第 ' + (currentStage + 1) + ' / ' + stages.length + ' 问';
+        document.getElementById('stageTitle').innerText = stage.title;
+        document.getElementById('aiPrompt').innerText = stage.prompt;
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('feedback').innerText = '点击选项后，AI 助教会给出下一步提示。';
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('nextBtn').innerText = currentStage === stages.length - 1 ? '完成实训' : '下一问';
+        document.getElementById('options').innerHTML = stage.options.map((option, index) =>
+            '<button class="option" data-index="' + index + '">' + option + '</button>'
+        ).join('');
+        Array.from(document.querySelectorAll('.option')).forEach(btn => {
+            btn.addEventListener('click', () => choose(Number(btn.dataset.index)));
+        });
+    }
+    function choose(index) {
+        if (answered) return;
+        const stage = stages[currentStage];
+        const optionButtons = Array.from(document.querySelectorAll('.option'));
+        optionButtons.forEach(btn => btn.classList.remove('wrong'));
+        if (index !== stage.answer) {
+            optionButtons[index].classList.add('wrong');
+            document.getElementById('feedback').innerText = 'AI 助教已给出引导提示，请返回重选。';
+            showGuidanceModal(stage.wrongFeedback);
+            return;
+        }
+        answered = true;
+        optionButtons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === stage.answer) btn.classList.add('correct');
+        });
+        document.getElementById('feedback').innerText = stage.feedback;
+        document.getElementById('nextBtn').disabled = false;
+    }
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (currentStage < stages.length - 1) {
+            currentStage += 1;
+            renderStage();
+        } else {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback complete';
+            feedback.innerText = summaryTitle + '：' + summaryText;
+            document.getElementById('nextBtn').disabled = true;
+            if (window.parent) window.parent.postMessage({ type: 'MODULE_COMPLETED', module: moduleName }, '*');
+        }
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        currentStage = 0;
+        renderStage();
+    });
+</script>
+</body>
+</html>`;
+};
+
+export const bridgeCalibrationJudgementHTML = createDifferentiatedCourseCaseHTML({
+    moduleName: '桥式测量调零与仪表判读实验',
+    pageTitle: '[BRIDGE_Lab] 桥式测量调零与仪表判读实验',
+    statusText: 'ZEROING LEDGER - READY FOR CLASSROOM REVIEW',
+    accentClass: 'bridge',
+    aiButtonLabel: '呼叫 AI 助教协助判读',
+    aiPanelTitle: 'AI 助教判读引导',
+    pages: [
+        {
+            kicker: 'Bridge Ledger',
+            title: '电桥平衡台账',
+            body: `
+                <p><strong>任务背景：</strong>学生正在用直流电桥测量未知电阻。检流计初始零位偏移，电桥调平过程出现“看似平衡但重复性差”的现象，需要先完成调零、限流保护和桥臂数据判读。</p>
+                <div class="grid-3">
+                    <div class="card metric"><span>检流计机械零位</span><strong class="warn">+2.8 div</strong><small>未校正前不可直接调桥</small></div>
+                    <div class="card metric"><span>保护电阻</span><strong class="ok">5 kΩ</strong><small>已串入检流计支路</small></div>
+                    <div class="card metric"><span>电源激励</span><strong class="info">1.5 V</strong><small>低压起调，避免撞针</small></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>桥式测量示意</h3>
+                        <div class="lab-diagram">
+                            <div class="bridge-arm a1"></div><div class="bridge-arm a2"></div><div class="bridge-arm a3"></div><div class="bridge-arm a4"></div>
+                            <div class="junction top">R1</div><div class="junction left">R2</div><div class="junction right">Rx</div><div class="junction bottom">R3</div>
+                            <div class="galvo">G +2.8</div>
+                        </div>
+                    </div>
+                    <div class="card white">
+                        <h3>桥臂初始记录</h3>
+                        <table>
+                            <tr><th>桥臂</th><th>设定值</th><th>判读备注</th></tr>
+                            <tr><td>R1</td><td>1000 Ω</td><td>比例臂基准</td></tr>
+                            <tr><td>R2</td><td>100 Ω</td><td>比例臂低值</td></tr>
+                            <tr><td>R3</td><td>2460 Ω</td><td>可调臂接近平衡点</td></tr>
+                            <tr><td>Rx</td><td>待测</td><td>必须在检流计校零后计算</td></tr>
+                        </table>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Sensitivity Log',
+            title: '零位与灵敏度记录',
+            body: `
+                <p>检流计灵敏度高，适合发现微小不平衡，但也容易因过大电流损伤。下表用于判断“读数变化”来自真实不平衡，还是来自零位偏置和操作过冲。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>调零前后偏转记录</h3>
+                        <table>
+                            <tr><th>步骤</th><th>状态</th><th>检流计偏转</th><th>结论</th></tr>
+                            <tr><td>1</td><td>未接电桥，仅机械零位</td><td class="warn">+2.8 div</td><td>零位偏置存在</td></tr>
+                            <tr><td>2</td><td>机械调零后</td><td class="ok">0 div</td><td>可进入电桥判断</td></tr>
+                            <tr><td>3</td><td>短时增大激励</td><td class="bad">12 div</td><td>撞针风险升高</td></tr>
+                            <tr><td>4</td><td>恢复低压并限流</td><td class="info">1.1 div</td><td>可细调桥臂</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>偏转稳定度</h3>
+                        <div class="ledger-row"><span>未校零重复性</span><div class="ledger-track"><div class="ledger-fill" style="width:82%; background:#f59e0b"></div></div><strong class="warn">差</strong></div>
+                        <div class="ledger-row"><span>限流后稳定度</span><div class="ledger-track"><div class="ledger-fill" style="width:74%; background:#22c55e"></div></div><strong class="ok">良</strong></div>
+                        <div class="ledger-row"><span>平衡点可复现</span><div class="ledger-track"><div class="ledger-fill" style="width:68%; background:#18d5ff"></div></div><strong class="info">可用</strong></div>
+                        <div class="card" style="margin-top:16px;">判读原则：先把仪表自身偏差排除，再用偏转方向与大小判断桥臂是否接近平衡。</div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Meter Suitability',
+            title: '电磁系仪表适用性对照',
+            body: `
+                <p>电磁系仪表依靠固定线圈磁场吸引软铁片产生转矩，可用于交直流测量，但刻度、灵敏度和精度特性与磁电系仪表不同。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>交直流复核表</h3>
+                        <table>
+                            <tr><th>仪表类型</th><th>适用信号</th><th>本实验角色</th><th>注意点</th></tr>
+                            <tr><td>磁电系检流计</td><td>微小直流</td><td>电桥平衡指示</td><td>必须先校零并限流</td></tr>
+                            <tr><td>电磁系电流表</td><td>交直流</td><td>支路电流复核</td><td>低端刻度较疏，读数需谨慎</td></tr>
+                            <tr><td>普通万用表</td><td>视档位而定</td><td>辅助检查导通</td><td>不能替代平衡判据</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>知识点映射</h3>
+                        <div class="grid-2">
+                            <div class="card">检流计灵敏度<br><strong class="ok">用于发现微小不平衡</strong></div>
+                            <div class="card">电磁系结构<br><strong class="info">固定线圈与软铁片</strong></div>
+                            <div class="card">交直流测量<br><strong class="violet">电磁系可兼容</strong></div>
+                            <div class="card">桥式测量<br><strong class="warn">平衡前不可计算 Rx</strong></div>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Judgement Sheet',
+            title: 'AI 判读任务书',
+            body: `
+                <p>AI 助教会把本实验拆成 4 个判断点。学生需要先理解实验顺序，再根据台账选择正确操作，而不是把所有指针偏转都当成被测元件故障。</p>
+                <table>
+                    <tr><th>层级</th><th>判读任务</th><th>必须使用的证据</th></tr>
+                    <tr><td>1</td><td>确认是否允许开始调桥</td><td>机械零位与外界干扰</td></tr>
+                    <tr><td>2</td><td>判断灵敏度和保护关系</td><td>偏转格数、激励电压、保护电阻</td></tr>
+                    <tr><td>3</td><td>选择交直流复核仪表</td><td>电磁系仪表结构与适用性</td></tr>
+                    <tr><td>4</td><td>形成完整实验流程</td><td>校零、限流、调平、复核</td></tr>
+                </table>`
+        }
+    ],
+    stages: [
+        {
+            title: '第一问：是否可以直接调桥',
+            prompt: 'AI 助教：检流计未接电桥时已经停在 +2.8 格。此时最合适的动作是什么？',
+            options: ['直接调 R3，让指针回零。', '先校正机械零位并检查外界干扰，再进入电桥平衡。', '提高电源电压，让偏转更明显。'],
+            answer: 1,
+            feedback: '正确。检流计用于判断微小电流是否为零，零位不准会让平衡点失去意义。',
+            wrongFeedback: '请先分清“仪表自身零位”和“电桥不平衡”。零位没有校准前，调桥得到的零点不可信。'
+        },
+        {
+            title: '第二问：灵敏度与保护',
+            prompt: 'AI 助教：学生想提高激励电压来放大偏转，这个做法主要风险是什么？',
+            options: ['检流计灵敏度高，过大电流可能造成撞针或线圈损伤。', '电压越高越准确，没有风险。', '只会让刻度颜色变浅。'],
+            answer: 0,
+            feedback: '正确。高灵敏度意味着分辨力强，也意味着必须限流保护。',
+            wrongFeedback: '检流计不是普通电流表。它能感知微小电流，也更怕过大电流冲击。'
+        },
+        {
+            title: '第三问：仪表适用性',
+            prompt: 'AI 助教：若要复核一段交流支路电流，为什么可选电磁系仪表？',
+            options: ['电磁系仪表靠线圈磁场吸引软铁片，可用于交直流测量。', '电磁系仪表只能测微小直流。', '电磁系仪表不用接入回路。'],
+            answer: 0,
+            feedback: '正确。电磁系仪表可用于交直流，但仍需注意刻度和精度。',
+            wrongFeedback: '请回到电磁系仪表的转矩形成原理：软铁片受磁场吸引，与磁电系仪表不同。'
+        },
+        {
+            title: '第四问：实验流程闭环',
+            prompt: 'AI 助教：哪一个流程最符合桥式测量规范？',
+            options: ['先大幅提高电源，再看哪个读数最大。', '校零和限流保护先行，再调桥臂平衡，最后用合适仪表复核。', '只要检流计有偏转，就判定 Rx 损坏。'],
+            answer: 1,
+            feedback: '完整。你把检流计零位、灵敏度保护、电磁系仪表适用性和桥式测量流程连接起来了。',
+            wrongFeedback: '桥式测量的目标是找平衡，不是追求大偏转。请按“校零-保护-调平-复核”的顺序判断。'
+        }
+    ],
+    summaryTitle: '实验完成',
+    summaryText: '已记录“桥式测量调零与仪表判读实验”，学生完成了检流计校零、限流保护、桥式平衡和电磁系仪表适用性判读。'
+});
+
+export const singlePhasePowerWorkOrderHTML = createDifferentiatedCourseCaseHTML({
+    moduleName: '单相电机功率测量工单',
+    pageTitle: '[WORK_ORDER] 单相电机功率测量工单',
+    statusText: 'MEASUREMENT PLAN - FIELD APPROVAL NEEDED',
+    accentClass: 'power',
+    aiButtonLabel: '呼叫 AI 助教协助制定测量方案',
+    aiPanelTitle: 'AI 助教测量方案引导',
+    pages: [
+        {
+            kicker: 'Work Order',
+            title: '测量工单与仪表盘',
+            body: `
+                <p><strong>任务背景：</strong>维护班要确认一台单相小电机的有功功率。学生需要根据电动系功率表接线、万用表量程和负载状态，制定一套不会误接、不会烧表、可复核的测量方案。</p>
+                <div class="grid-4">
+                    <div class="card metric"><span>额定电压</span><strong>220 V</strong><small>单相交流</small></div>
+                    <div class="card metric"><span>预计电流</span><strong class="info">1.8 A</strong><small>启动瞬间更高</small></div>
+                    <div class="card metric"><span>功率因数</span><strong class="warn">0.72</strong><small>不可只用 UI 相乘</small></div>
+                    <div class="card metric"><span>万用表当前档</span><strong class="bad">mA</strong><small>需重新选量程</small></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>功率表接线结构</h3>
+                        <div class="work-diagram">
+                            <div class="wire"></div>
+                            <div class="coil current">电流线圈<br>串联</div>
+                            <div class="load">MOTOR<br>单相负载</div>
+                            <div class="coil voltage">电压线圈<br>并联</div>
+                        </div>
+                    </div>
+                    <div class="card white">
+                        <h3>工单约束</h3>
+                        <table>
+                            <tr><th>项目</th><th>要求</th><th>风险</th></tr>
+                            <tr><td>电流线圈</td><td>串入负载回路</td><td>并错会短路或无读数</td></tr>
+                            <tr><td>电压线圈</td><td>并接负载两端</td><td>串错会改变回路</td></tr>
+                            <tr><td>万用表</td><td>从高量程开始</td><td>低档位可能烧保险</td></tr>
+                            <tr><td>同名端</td><td>按功率表标识接入</td><td>方向错导致读数异常</td></tr>
+                        </table>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Meter Board',
+            title: '功率表与万用表读数记录',
+            body: `
+                <p>本页模拟现场测量记录。重点不是寻找故障点，而是根据测量对象和仪表结构确定正确测量方案。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>测量记录表</h3>
+                        <table>
+                            <tr><th>测量轮次</th><th>功率表</th><th>万用表</th><th>备注</th></tr>
+                            <tr><td>A</td><td class="bad">86 W</td><td>219 V</td><td>同名端疑似反接</td></tr>
+                            <tr><td>B</td><td class="warn">OL</td><td class="bad">mA 档测主回路</td><td>量程错误</td></tr>
+                            <tr><td>C</td><td class="ok">282 W</td><td class="info">1.78 A</td><td>接线与量程均复核</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>负载状态卡</h3>
+                        <div class="ledger-row"><span>空载运行</span><div class="ledger-track"><div class="ledger-fill" style="width:35%; background:#18d5ff"></div></div><strong>0.62 A</strong></div>
+                        <div class="ledger-row"><span>轻载运行</span><div class="ledger-track"><div class="ledger-fill" style="width:66%; background:#22c55e"></div></div><strong>1.18 A</strong></div>
+                        <div class="ledger-row"><span>额定附近</span><div class="ledger-track"><div class="ledger-fill" style="width:86%; background:#f59e0b"></div></div><strong>1.78 A</strong></div>
+                        <div class="card" style="margin-top:16px;">功率测量不能只靠电压和电流相乘，还要考虑功率因数和功率表线圈接入。</div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Range Decision',
+            title: '量程选择与复核矩阵',
+            body: `
+                <p>万用表在本工单中承担辅助复核，不替代功率表。学生需要先估计量级，再选择安全档位和表笔插孔。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>量程选择矩阵</h3>
+                        <table>
+                            <tr><th>测量对象</th><th>推荐档位</th><th>起始策略</th><th>禁止动作</th></tr>
+                            <tr><td>主回路电流</td><td>10A 档</td><td>先高后低</td><td>mA 档直接串入</td></tr>
+                            <tr><td>负载电压</td><td>AC 600V 或 250V 档</td><td>确认交流档</td><td>电阻档带电测量</td></tr>
+                            <tr><td>线圈导通</td><td>断电后电阻档</td><td>先断电验电</td><td>带电测欧姆</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>功率测量知识点</h3>
+                        <div class="grid-2">
+                            <div class="card">电动系仪表原理<br><strong class="info">双线圈转矩</strong></div>
+                            <div class="card">功率测量应用<br><strong class="ok">电压线圈并联</strong></div>
+                            <div class="card">万用表结构<br><strong class="violet">表头与分流/倍压</strong></div>
+                            <div class="card">量程选择<br><strong class="warn">先估计再接入</strong></div>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Plan Sheet',
+            title: 'AI 测量方案任务书',
+            body: `
+                <p>AI 助教会要求学生从“接线方案、量程保护、读数复核、结论表达”四个环节制定方案。最终目标是形成可执行的课堂工单，而不是单纯猜测哪个仪表坏了。</p>
+                <table>
+                    <tr><th>环节</th><th>学生需提交</th><th>判定依据</th></tr>
+                    <tr><td>功率表接线</td><td>电流线圈串联，电压线圈并联，同名端正确</td><td>电动系功率表结构</td></tr>
+                    <tr><td>万用表量程</td><td>估算量级，高量程起测，确认表笔孔</td><td>万用表结构和安全保护</td></tr>
+                    <tr><td>负载复核</td><td>记录电压、电流、功率和负载状态</td><td>单相电机工况</td></tr>
+                    <tr><td>结果表达</td><td>说明有功功率，不能只写 UI 乘积</td><td>功率因数和功率表读数</td></tr>
+                </table>`
+        }
+    ],
+    stages: [
+        {
+            title: '第一问：功率表如何接入',
+            prompt: 'AI 助教：要测单相电机有功功率，功率表的电流线圈和电压线圈应如何接入？',
+            options: ['电流线圈串入负载回路，电压线圈并接负载两端，并核对同名端。', '两个线圈都并联在电源两端。', '只接电压线圈即可测功率。'],
+            answer: 0,
+            feedback: '正确。电动系功率表通过电流线圈和电压线圈的相互作用反映有功功率。',
+            wrongFeedback: '功率表不是普通电压表。请先区分电流线圈和电压线圈的接入方式。'
+        },
+        {
+            title: '第二问：为什么不能只用 UI 相乘',
+            prompt: 'AI 助教：单相电机的电压约 220V、电流约 1.8A，为什么不能直接把二者相乘当作有功功率？',
+            options: ['因为电机是交流感性负载，需要考虑功率因数，有功功率应以功率表或完整计算为准。', '因为电压和电流没有单位。', '因为万用表只能显示整数。'],
+            answer: 0,
+            feedback: '正确。交流负载的有功功率与相位关系有关，电动系功率表正是为此服务。',
+            wrongFeedback: '请注意负载是单相电机，属于感性负载。电压电流乘积更接近视在功率，不等同于有功功率。'
+        },
+        {
+            title: '第三问：万用表量程',
+            prompt: 'AI 助教：需要用万用表复核主回路电流时，最稳妥的量程策略是什么？',
+            options: ['带电从 mA 档开始试。', '先断开接入点，估算电流量级，从 10A 高量程和正确插孔开始。', '用电阻档直接测运行电机。'],
+            answer: 1,
+            feedback: '正确。先高后低、确认插孔和保险状态，是保护仪表和学生安全的关键。',
+            wrongFeedback: '万用表量程不是随意试出来的。主回路电流应先估算量级，并从高量程与正确插孔开始。'
+        },
+        {
+            title: '第四问：形成工单结论',
+            prompt: 'AI 助教：哪一个结论最适合写入测量工单？',
+            options: ['只写“功率表读数异常”，不说明接线。', '按正确接线得到约 282W，并用万用表复核电压电流，说明量程、插孔和负载状态。', '删除万用表数据，只保留最大读数。'],
+            answer: 1,
+            feedback: '完整。这个结论同时说明了功率表接线、量程保护、复核数据和负载工况。',
+            wrongFeedback: '工单结论要能被复现。请把接线、量程、读数和负载状态写完整。'
+        }
+    ],
+    summaryTitle: '工单完成',
+    summaryText: '已记录“单相电机功率测量工单”，学生完成了电动系功率表接线、万用表量程选择和有功功率复核方案。'
+});
+
+export const precisionDcCalibrationHTML = createDifferentiatedCourseCaseHTML({
+    moduleName: '微弱直流信号精密标定',
+    pageTitle: '[CAL_Report] 微弱直流信号精密标定',
+    statusText: 'REFERENCE CHAIN - CALIBRATION REVIEW',
+    accentClass: 'calibration',
+    aiButtonLabel: '呼叫 AI 助教协助完成标定',
+    aiPanelTitle: 'AI 助教标定引导',
+    pages: [
+        {
+            kicker: 'Calibration Report',
+            title: '实验室标定首页',
+            body: `
+                <p><strong>任务背景：</strong>一只 100mV 温度变送器需要出厂标定。普通电压表读数偏低，直流电位差计接近平衡。学生需要根据标准电池、工作电流、补偿平衡点和电子电压表输入阻抗，完成精密标定报告。</p>
+                <div class="grid-4">
+                    <div class="card metric"><span>标准电池</span><strong class="violet">1.0186 V</strong><small>基准稳定</small></div>
+                    <div class="card metric"><span>工作电流</span><strong class="info">10.00 mA</strong><small>已校准</small></div>
+                    <div class="card metric"><span>补偿平衡点</span><strong class="ok">99.86 mV</strong><small>检流计近零</small></div>
+                    <div class="card metric"><span>普通表读数</span><strong class="bad">92.4 mV</strong><small>疑似负载效应</small></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>标定链路</h3>
+                        <div class="cal-diagram">
+                            <div class="cal-line"></div>
+                            <div class="terminal std">STD<br>Cell</div>
+                            <div class="terminal pot">POT<br>Null</div>
+                            <div class="terminal dut">DUT<br>100mV</div>
+                        </div>
+                    </div>
+                    <div class="card white">
+                        <h3>标定报告摘要</h3>
+                        <table>
+                            <tr><th>证据</th><th>记录</th><th>结论</th></tr>
+                            <tr><td>检流计</td><td class="ok">近零</td><td>补偿平衡成立</td></tr>
+                            <tr><td>普通电压表</td><td class="bad">92.4mV</td><td>可能拉低高内阻信号</td></tr>
+                            <tr><td>电子电压表</td><td class="info">10MΩ</td><td>可作为高阻抗复核</td></tr>
+                        </table>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Reference Chain',
+            title: '标准电池与工作电流',
+            body: `
+                <p>直流电位差计的可信度来自基准链。若标准电池或工作电流没有校准，补偿平衡点没有可追溯意义。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>基准链检查表</h3>
+                        <table>
+                            <tr><th>项目</th><th>记录</th><th>状态</th></tr>
+                            <tr><td>标准电池温度</td><td>20.1°C</td><td class="ok">可用</td></tr>
+                            <tr><td>标准电池电动势</td><td>1.0186V</td><td class="ok">稳定</td></tr>
+                            <tr><td>工作电流</td><td>10.00mA</td><td class="ok">已校准</td></tr>
+                            <tr><td>检流计零位</td><td>0.1div</td><td class="info">接近平衡</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>补偿过程记录</h3>
+                        <div class="ledger-row"><span>粗调平衡</span><div class="ledger-track"><div class="ledger-fill" style="width:78%; background:#8b5cf6"></div></div><strong>99.4mV</strong></div>
+                        <div class="ledger-row"><span>细调平衡</span><div class="ledger-track"><div class="ledger-fill" style="width:91%; background:#18d5ff"></div></div><strong>99.86mV</strong></div>
+                        <div class="ledger-row"><span>复测漂移</span><div class="ledger-track"><div class="ledger-fill" style="width:18%; background:#22c55e"></div></div><strong>0.03mV</strong></div>
+                        <div class="card" style="margin-top:16px;">平衡时被测支路几乎不取电流，是补偿法适合微弱直流电压测量的关键。</div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Input Impedance',
+            title: '输入阻抗与负载效应对比',
+            body: `
+                <p>微弱信号源内阻较高时，测量仪表会成为电路的一部分。普通表读数偏低不一定是变送器不合格，也可能是仪表输入阻抗造成的负载效应。</p>
+                <div class="grid-2">
+                    <div class="card white">
+                        <h3>仪表对比</h3>
+                        <table>
+                            <tr><th>仪表</th><th>输入阻抗</th><th>读数</th><th>用途</th></tr>
+                            <tr><td>普通指针电压表</td><td class="warn">约 20kΩ/V</td><td class="bad">92.4mV</td><td>不宜作为最终标定</td></tr>
+                            <tr><td>电子电压表</td><td class="info">10MΩ</td><td class="ok">99.7mV</td><td>高阻抗复核</td></tr>
+                            <tr><td>直流电位差计</td><td class="violet">平衡时近似不取流</td><td class="ok">99.86mV</td><td>主标定依据</td></tr>
+                        </table>
+                    </div>
+                    <div class="card white">
+                        <h3>报告判据</h3>
+                        <div class="grid-2">
+                            <div class="card">补偿测量原理<br><strong class="ok">平衡近零电流</strong></div>
+                            <div class="card">标准电池<br><strong class="violet">建立可追溯基准</strong></div>
+                            <div class="card">电子电压表<br><strong class="info">高输入阻抗</strong></div>
+                            <div class="card">高阻抗测量<br><strong class="warn">避免负载效应</strong></div>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            kicker: 'Final Report',
+            title: 'AI 标定任务书',
+            body: `
+                <p>AI 助教会引导学生完成标定报告，而不是把普通表偏低直接判成设备故障。最终报告必须写明基准链、补偿平衡、高阻抗复核和结论边界。</p>
+                <table>
+                    <tr><th>报告段落</th><th>应包含内容</th><th>课程知识点</th></tr>
+                    <tr><td>基准说明</td><td>标准电池、温度、工作电流校准</td><td>标准电池与工作电流</td></tr>
+                    <tr><td>主测量</td><td>电位差计补偿平衡读数</td><td>补偿测量原理</td></tr>
+                    <tr><td>复核测量</td><td>电子电压表高输入阻抗读数</td><td>电子电压表特点</td></tr>
+                    <tr><td>异常解释</td><td>普通表读数偏低来自负载效应</td><td>高阻抗测量影响</td></tr>
+                </table>`
+        }
+    ],
+    stages: [
+        {
+            title: '第一问：普通表为何偏低',
+            prompt: 'AI 助教：100mV 信号用普通表读到 92.4mV，最应该先解释为什么？',
+            options: ['普通表输入阻抗不足，对高内阻微弱信号产生负载效应。', '变送器一定不合格。', '标准电池颜色不够亮。'],
+            answer: 0,
+            feedback: '正确。仪表会影响被测对象，微弱直流信号尤其需要关注输入阻抗。',
+            wrongFeedback: '请不要把普通表读数直接当成被测对象真实值。微弱信号源可能被仪表输入阻抗拉低。'
+        },
+        {
+            title: '第二问：补偿法价值',
+            prompt: 'AI 助教：直流电位差计为什么适合做本次主标定？',
+            options: ['补偿平衡时几乎不从被测对象取电流，能减小负载影响。', '它会自动放大所有信号。', '它不需要标准基准。'],
+            answer: 0,
+            feedback: '正确。补偿测量的优势在于平衡状态下对被测回路影响极小。',
+            wrongFeedback: '补偿法的关键词是“平衡”和“近零电流”，不是放大，也不是跳过基准。'
+        },
+        {
+            title: '第三问：基准链检查',
+            prompt: 'AI 助教：写入报告前，哪一项必须作为基准链先确认？',
+            options: ['标准电池状态和工作电流校准。', '仪表外壳新旧。', '把导线全部换成长线。'],
+            answer: 0,
+            feedback: '正确。标准电池和工作电流决定了电位差计读数是否可追溯。',
+            wrongFeedback: '精密标定先看基准链。没有稳定标准和工作电流，平衡点没有可信度。'
+        },
+        {
+            title: '第四问：完成标定结论',
+            prompt: 'AI 助教：哪一个标定结论最完整？',
+            options: ['按普通表 92.4mV 直接判不合格。', '以电位差计补偿平衡 99.86mV 为主，电子电压表高阻抗复核，说明普通表偏低来自负载效应。', '只写电子电压表读数，不写基准链。'],
+            answer: 1,
+            feedback: '完整。这个结论包含基准、主测量、复核测量和异常解释。',
+            wrongFeedback: '标定结论必须可追溯。请同时写明补偿平衡、高阻抗复核和普通表偏低原因。'
+        }
+    ],
+    summaryTitle: '标定完成',
+    summaryText: '已记录“微弱直流信号精密标定”，学生完成了补偿测量、标准基准、高阻抗复核和负载效应解释。'
+});
+
 // 1. 第一章：配电系统故障诊断沙盘
 export const ghostTrippingHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
