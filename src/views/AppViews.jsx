@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BookOpen, MonitorPlay, ClipboardCheck, ArrowRight, BrainCircuit, User, Bell, Search, BarChart3, ChevronRight, X, FileText, CheckCircle, Wrench, FileQuestion, Sparkles, Loader2, Lock, AlertCircle, TrendingUp, Users, Target, CheckCircle2, Clock, FileSpreadsheet, ChevronDown, ChevronUp, UploadCloud, RefreshCw, CheckSquare, Presentation, Lightbulb, ArrowDownToLine, Layers, Settings2, Send, MessageSquare, Activity } from 'lucide-react';
 import { courseList, knowledgeModules, knowledgePointMockData, radarDimensions, studentRadarData, teachingGuides } from '../data/courseData';
 import { generateWithGemini } from '../services/gemini';
@@ -85,27 +85,73 @@ const getGeneratedCaseSummaries = (activeCourse, generatedCaseState = {}) => {
   return cases;
 };
 
-export const Navbar = ({ navigateTo }) => (
-  <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between h-16 items-center">
-        <div className="flex items-center cursor-pointer" onClick={() => navigateTo('home')}>
-          <div className="bg-slate-900 p-2 rounded-lg mr-3">
-            <BrainCircuit className="h-6 w-6 text-teal-400" />
+export const Navbar = ({ navigateTo }) => {
+  const [openMenu, setOpenMenu] = useState(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleMenu = (menuName) => {
+    setOpenMenu(prev => prev === menuName ? null : menuName);
+  };
+
+  return (
+    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <div className="flex items-center cursor-pointer" onClick={() => navigateTo('home')}>
+            <div className="bg-slate-900 p-2 rounded-lg mr-3">
+              <BrainCircuit className="h-6 w-6 text-teal-400" />
+            </div>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Cognis <span className="text-teal-600 font-light">AI Agent</span></span>
           </div>
-          <span className="font-bold text-xl text-slate-900 tracking-tight">Cognis <span className="text-teal-600 font-light">AI Agent</span></span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button className="text-slate-400 hover:text-slate-600 transition-colors"><Search className="h-5 w-5" /></button>
-          <button className="text-slate-400 hover:text-slate-600 transition-colors"><Bell className="h-5 w-5" /></button>
-          <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-            <User className="h-4 w-4 text-slate-600" />
+          <div ref={menuRef} className="flex items-center space-x-4 relative">
+            <button className="text-slate-400 hover:text-slate-600 transition-colors" aria-label="搜索">
+              <Search className="h-5 w-5" />
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => toggleMenu('messages')}
+                className={`text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full ${openMenu === 'messages' ? 'bg-slate-100 text-slate-600' : ''}`}
+                aria-label="消息"
+              >
+                <Bell className="h-5 w-5" />
+              </button>
+              {openMenu === 'messages' && (
+                <div className="absolute right-0 top-10 w-56 bg-white border border-slate-200 rounded-xl shadow-xl py-3 px-4 text-sm text-slate-600">
+                  无新消息
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => toggleMenu('account')}
+                className={`h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border transition-colors ${openMenu === 'account' ? 'border-teal-300 ring-2 ring-teal-100' : 'border-slate-200 hover:border-slate-300'}`}
+                aria-label="账户"
+              >
+                <User className="h-4 w-4 text-slate-600" />
+              </button>
+              {openMenu === 'account' && (
+                <div className="absolute right-0 top-10 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-3 px-4 text-sm text-slate-600">
+                  请联系管理员添加账户
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
-);
+    </nav>
+  );
+};
 
 // --- UI 组件: 雷达图 ---
 const RadarChart = ({ data, dimensions, size = 300 }) => {
